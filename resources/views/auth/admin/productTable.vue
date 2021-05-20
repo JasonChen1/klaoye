@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="feature-wp">
-            <b-field class="file is-info mr-1" :class="{'has-name': !!file}">
+            <!-- <b-field class="file is-info mr-1" :class="{'has-name': !!file}">
                 <b-upload v-model="file" class="file-label">
                     <span class="file-cta">
                         <b-icon class="file-icon" icon="upload"></b-icon>
                         <span class="file-label">Import Products</span>
                     </span>
                 </b-upload>
-            </b-field>
+            </b-field> -->
             <b-button type="is-info" @click="addProduct">
                 <b-icon icon="plus" size="is-small"></b-icon>
                 <span >Add Product</span>
@@ -41,19 +41,21 @@
                 checkable
                 :checked-rows.sync="checkedRows"
                 :is-row-checkable="(row) => row.id"
+
+                :row-class="(row, index) => row.status === 1 && 'is-active'"
                 >
 
                 <b-table-column field="code" label="Code" sortable searchable v-slot="props">
                     {{ props.row.code }}
                 </b-table-column>
-                <b-table-column field="name" label="Name" sortable searchable v-slot="props">
-                    <div class="d-flex">
-                        <div>
-                            <span class="cursor" @click="activeImageModal(props.row.image)">
-                                <img :src="props.row.image" :alt="props.row.name" >
+                <b-table-column field="name" label="Name" sortable searchable v-slot="props" width="250">
+                    <span class="pl-2" v-html="props.row.name"></span>
+                    <div class="images-wp">
+                        <div v-for="(img,i) in props.row.images">
+                            <span class="cursor" @click="activeImageModal(img.image_url)">
+                                <img :src="`/storage/${img.image_url}`" :alt="props.row.name" >
                             </span>
                         </div>
-                        <span class="pl-2" v-html="props.row.name"></span>
                     </div>
                 </b-table-column>
                 <b-table-column field="price" label="Price" width="120" sortable searchable v-slot="props">
@@ -67,7 +69,7 @@
                 </b-table-column>
                 <b-table-column field="details" label="Details" searchable v-slot="props">
                     <div class="color-block-wp">
-                        <Poptip placement="top" width="200" word-wrap v-for="(color,i) in props.row.colours" :key="i" v-if="props.row.colours.length>0">
+                        <Poptip placement="top" width="200" word-wrap v-for="(color,i) in props.row.details" :key="i" v-if="props.row.details.length>0">
                             <div class="color-block" :style="`background: ${color.color_code}`">
                                 <span class="cross">x</span>
                             </div>
@@ -75,23 +77,28 @@
                                 <p><i class="ivu-icon ivu-icon-ios-help-circle"></i> Are you sure you want to remove this colour?</p>
                                 <div class="poptip-footer">
                                     <b-button size="is-small" @click.prevent="closePoptip">Cancel</b-button>
-                                    <b-button size="is-small" type="is-info" class="ml-2" @click.prevent="deleteColor(props,color.id,i)">Remove</b-button>
+                                    <b-button size="is-small" type="is-info" class="ml-2" @click.prevent="deleteColor(props.row.details,color.id,i)">Remove</b-button>
                                 </div>
                             </div>
                         </Poptip>
                         <div class="color-block" style="background: #fff; border: 1px solid #000;">
-                            <span class="cross" style="color: #000 !important;" @click.prevent="addColourModal(props)">+</span>
+                            <span class="cross" style="color: #000 !important;" @click.prevent="addColourModal(props.row)">+</span>
                         </div>
                     </div>
                 </b-table-column>
                 <b-table-column field="action" label="Action" width="110" v-slot="props">
-                    <b-switch 
-                        v-model="props.row.status==1?true:false" 
-                        type="is-info"
-                        @click.prevent.native="activeProduct(props.row,props.row.status==1?0:1)">
-                        {{props.row.status==1? 'Active':'Inactive'}}
-                    </b-switch>
-                    <b-button type="is-info" icon-left="pencil-outline" @click.prevent="editProduct(props.row)">Edit</b-button>
+                    <b-dropdown :triggers="['hover']" aria-role="list" class="actionDropdown">
+                        <template #trigger>
+                            <b-button
+                            label=""
+                            type="is-info"
+                            icon-right="menu-down" />
+                        </template>
+
+                        <b-dropdown-item aria-role="listitem" @click.prevent.native="activeProduct(props.row,props.row.status==1?0:1)"> {{props.row.status==1? 'Inactive':'Active'}}</b-dropdown-item>
+                        <b-dropdown-item aria-role="listitem" icon-left="pencil-outline" @click.prevent.native="editProduct(props.row)">Edit</b-dropdown-item>
+                        <b-dropdown-item aria-role="listitem" icon-left="trash-can-outline" @click.prevent.native="deleteProduct(props.row,props.index)">Delete</b-dropdown-item>
+                    </b-dropdown>
                 </b-table-column>
             </b-table>
             <c-pagination 
@@ -134,7 +141,7 @@
         </b-modal>
 
         <b-modal :active.sync="showImageModal"  v-if="imageUrl">
-            <p class="image is-4by3">
+            <p class="image">
                 <img :src="imageUrl">
             </p>
         </b-modal>
@@ -151,7 +158,7 @@
                     <p class="modal-card-title">{{modalTitle}}</p>
                 </header>
                 <section class="modal-card-body">
-                    <form>
+                    <form v-if="modalType!=='delete'">
                         <div class="form-input">
                             <b-field label="Code">
                                 <b-input type="text" class="" v-model="form.code"  @keyup="errors.code=''" placeholder="Code" required></b-input>
@@ -212,7 +219,24 @@
                             <b-field label="Image">
                                 <b-upload v-model="form.images"
                                     multiple
-                                    drag-drop>
+                                    drag-drop
+                                    v-if="modalType==='add'">
+                                    <section class="section">
+                                        <div class="content has-text-centered">
+                                            <p>
+                                                <b-icon
+                                                    icon="upload"
+                                                    size="is-large">
+                                                </b-icon>
+                                            </p>
+                                            <p>Drop your files here or click to upload</p>
+                                        </div>
+                                    </section>
+                                </b-upload>
+                                <b-upload v-model="uploads"
+                                    multiple
+                                    drag-drop
+                                    v-else>
                                     <section class="section">
                                         <div class="content has-text-centered">
                                             <p>
@@ -226,21 +250,37 @@
                                     </section>
                                 </b-upload>
                             </b-field>
-                            <div class="preview-container" >
-                                <div class="preview-wrapper" v-for="(img,i) in form.images" :key="i" v-if="form.images.length>0">
+                            <div class="preview-container">
+                                <div class="preview-wrapper" v-for="(img,i) in uploads" :key="i" v-if="uploads.length>0">
                                     <div class="overlay">
                                         <div class="center">
-                                            <span @click.prevent="removeImg(i)">
+                                            <span @click.prevent="removeImg(i,true)">
                                                 <b-icon class="icon-white" icon="trash-can-outline" size="is-medium" ></b-icon>
                                             </span>
                                         </div>
                                     </div>
                                     
-                                    <img :src="previewImg(img)" class="preview-img">
+                                    <img :src="previewImg(img,true)" class="preview-img">
                                 </div>
                             </div>
+                            <div class="preview-container">
+                                <div class="preview-wrapper" v-for="(img,i) in form.images" :key="i" v-if="form.images.length>0">
+                                    <div class="overlay">
+                                        <div class="center">
+                                            <span @click.prevent="removeImg(i,false)">
+                                                <b-icon class="icon-white" icon="trash-can-outline" size="is-medium" ></b-icon>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <img :src="previewImg(img,false)" class="preview-img">
+                                </div>
+                                
+                            </div>
+
                         </div>
                     </form>
+                    <p v-else>Are you sure you want to delete this product?</p>
                 </section>
                 <div class="modal-card-foot">
                     <b-button type="is-danger" @click="showModal=false">Cancel</b-button>
@@ -304,6 +344,7 @@
                 imageUrl:null,
                 mReload:0,
                 // form
+                uploads:[],
                 form: new Form({
                     code:'',
                     name:'',
@@ -320,6 +361,7 @@
                     color_code:'#178da0',
                     id:'',
                 }),
+                index:null,
                 colorErrors:[],
                 // import
                 file:null,
@@ -350,11 +392,39 @@
             }
         },
         methods:{
-            previewImg(file){
-                return URL.createObjectURL(file)
+            previewImg(file,editUpload){
+                if(this.modalType==='add'|| editUpload){
+                    return URL.createObjectURL(file)
+                }else{
+                    return window.location.href.replace(window.location.pathname,`/storage/${file.image_url}`)
+                }
             },
-            removeImg(index){
-                this.form.images.splice(index,1)
+            removeImg(index,editUpload){
+                if(this.modalType==='add' ){
+                    this.form.images.splice(index,1)
+                }else if(editUpload){
+                    this.uploads.splice(index,1)
+                }else{
+                    axios.delete(`/api/admin/product/image/${this.form.images[index].id}`)
+                    .then(res=>{
+                        this.form.images.splice(index,1)
+                        this.toastMessage = 'Delete Product Image Successfully'
+                        this.toastType = 'is-success'
+                    })
+                    .catch(err=>{
+                        this.toastMessage = 'Delete Product Image Failed'
+                        this.toastType = 'is-danger'
+                    })
+                    .finally(res=>{
+                        this.$buefy.notification.open({
+                            duration: 3000,
+                            message: this.toastMessage,
+                            position: 'is-top-right',
+                            type: this.toastType,
+                            hasIcon: true
+                        })
+                    })
+                }
             },
             exportStock(){
                 axios({
@@ -373,10 +443,10 @@
                     console.log(err)
                 })
             },
-            deleteColor(row,id,i){
-                axios.delete(`/api/colour/${id}`)
+            deleteColor(details,id,i){
+                axios.delete(`/api/admin/product/colour/${id}`)
                 .then(res=>{
-                    row.colours.splice(i,1)
+                    details.splice(i,1)
                     this.closePoptip()
                 })
                 .catch(err=>{})
@@ -388,16 +458,16 @@
             },
             addColourSubmit(){
                 this.isModalLoading = true
-                this.colorForm.submit('post',`/api/colour`)
+                this.colorForm.submit('post',`/api/admin/product/colour`)
                 .then(res=>{
-                    this.row.colours.push(res)
+                    this.row.details.push(res)
                     this.showColorModal = false
-                    this.toastMessage = this.$t('admin.add_colours_success')
+                    this.toastMessage = 'Add Colour Successfully'
                     this.toastType = 'is-success'
                 })
                 .catch(err=>{
                     this.colorErrors = err
-                    this.toastMessage = this.$t('admin.add_colours_failed')
+                    this.toastMessage = 'Add Colour Failed'
                     this.toastType = 'is-danger'
                 })
                 .finally(res=>{
@@ -413,7 +483,7 @@
             },
             activeImageModal(code){
                 this.showImageModal = true
-                this.imageUrl =`https://ximiphoto.oss-cn-hangzhou.aliyuncs.com/thumb/${code}.jpg?x-oss-process=style/yuan`
+                this.imageUrl = window.location.href.replace(window.location.pathname,`/storage/${code}`)
             },
             loadData(){
                 this.isLoading = true;
@@ -462,23 +532,35 @@
                 this.$refs.table.toggleDetails(row)
             },
             addProduct(){
+                this.modalType = 'add'
                 this.modalTitle = "Add Product"
                 this.modalBtn = 'Add'
-                this.modalType = 'add'
                 this.showModal = true
+                Object.keys(this.form).map(field=>{
+                    this.form[field] = ''
+                })
+                this.form.images=[]
             },
             editProduct(row){
+                this.modalType = 'edit'
                 this.modalTitle = "Edit Product"
                 this.modalBtn = 'Edit'
-                this.modalType = 'edit'
                 this.row = row
+                this.uploads = []
                 Object.keys(row).map(field=>{
                     this.form[field] = row[field]
                 })
                 this.showModal = true
             },
+            deleteProduct(row,index){
+                this.index = index
+                this.modalType = 'delete'
+                this.modalTitle = 'Delete Product'
+                this.modalBtn = 'Delete'
+                this.row = row
+                this.showModal = true
+            },
             activeProduct(row,status){
-                let pid = row.product_id
                 axios.post(`/api/admin/product/set`,{
                     id:row.id,
                     status:status
@@ -503,16 +585,25 @@
                 })
             },
             modalSubmit(){
-                let action = this.modalType==='add'?'post':
-                             this.modalType==='edit'?'patch':
-                             this.modalType==='delete'?'delete':''
                 let query = this.modalType==='add'?'':`/${this.row.id}`
+                let action = this.modalType ==='delete'?'delete':'post'
+
                 this.isModalLoading = true
-                this.form.submit(action,`/api/admin/products${query}`,true)
+                if(this.modalType==='edit'){
+                    this.form.images = this.uploads
+                }
+
+                this.form.submit(action,`/api/admin/products${query}`,this.modalType==='delete'?false:true)
                 .then(res=>{
-                    Object.keys(this.row).map(field=>{
-                        this.row[field] = res[field]
-                    })
+                    if(this.modalType==='add'){
+                        this.tableData.push(res)
+                    }else if(this.modalType==='edit'){
+                        Object.keys(this.row).map(field=>{
+                            this.row[field] = res[field]
+                        })
+                    }else{
+                        this.tableData.splice(this.index,1)
+                    }
                     this.showModal = false
                     this.toastMessage = `${this.modalTitle} Successfully`
                     this.toastType = 'is-success'
@@ -697,6 +788,18 @@
                         cursor: pointer;
                     }
                 }
+            }
+        }
+    }
+    .images-wp{
+        display: flex;
+        flex-wrap: wrap;
+        img{
+            width: 50px;
+            height: 50px;
+            margin-right: .5rem;
+            &:hover{
+                cursor:pointer;
             }
         }
     }

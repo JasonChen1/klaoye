@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Product,ProductImage};
+use App\Models\{Product,ProductImage,ProductDetail};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Product as ProductRequest;
@@ -18,8 +18,7 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        
+    {       
         $where = [];
         $orderField = 'id';
         $order = 'desc';
@@ -35,14 +34,15 @@ class ProductController extends Controller
                     array_push($where, [$key,'like','%'.$value.'%']);
                 }
             }
-            return Product::with(['details','images'])->orderBy($orderField,$order)->paginate(2);
+            return Product::with(['details','images'])->where($where)->orderBy($orderField,$order)->paginate(10);
         }
 
         return Cache::tags(['products'])->rememberForever('products.all.page_'.$request->page.'_admin', function (){
-            return Product::with(['details','images'])->orderBy('id','desc')->paginate(2);
+            return Product::with(['details','images'])->orderBy('id','desc')->paginate(10);
         });
     }
 
+    /*set product status 0:inactive 1:active*/
     public function setActive(Request $request){
         $product = Product::findOrFail($request->id);
         $product->update(['status'=>$request->status]);
@@ -58,13 +58,12 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
- 
         $prod = Product::create($request->all());
 
         if($request->images){
             foreach ($request->images as $image) {
                 $name = $image->getClientOriginalName();
-                $path = $image->storeAs('public/images',$name);
+                $path = $image->storeAs('images',$name,'public');
                 $img = new ProductImage([
                     'image_url'=>$path
                 ]);
@@ -72,8 +71,16 @@ class ProductController extends Controller
                 $prod->images()->save($img);
             }
         }
-        
+        Cache::tags('products')->flush();
         return response()->json($prod->load(['details','images']),200);
+    }
+
+    /*remove product image*/
+    public function deleteImage(Request $request,$id){
+        $image = ProductImage::findOrFail($id);
+        $image->delete();
+        Cache::tags('products')->flush();
+        return response()->json('done',204);
     }
 
     /**
@@ -94,9 +101,42 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        $v = Validator::make($request->all(), [
+            "name"=>'string|required',
+            "code" => 'required|string|exists:products,code',
+            "price" => 'required|numeric',
+            "status" => 'nullable|integer',
+            "stock" => 'required|integer',
+            "size" => 'nullable|string',
+            "description"=> 'nullable|string',
+            'images' => 'array|nullable',
+            'images.*'=>'nullable|image|mimes:jpg,png,jpeg,gif,svg|max:10240',
+        ]);
+
+        if ($v->fails()) {
+            return response()->json($v->errors(),422);
+        }    
+
+        $prod = Product::findOrFail($id);
+        $prod->update($request->all());
+
+        if($request->images){
+            foreach ($request->images as $image) {
+                $name = $image->getClientOriginalName();
+                $path = $image->storeAs('images',$name,'public');
+                $img = new ProductImage([
+                    'image_url'=>$path
+                ]);
+
+                $prod->images()->save($img);
+            }
+        }
+
+        Cache::tags('products')->flush();
+
+        return response()->json($prod->load(['details','images']),200);
     }
 
     /**
@@ -105,8 +145,31 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        $prod = Product::findOrFail($id);
+        $prod->delete();
+        Cache::tags('products')->flush();
+        return response()->json('done',204);
+    }
+
+    /*add a colour to product*/
+    public function addColour(Request $requset){
+
+        $prod = Product::findOrFail($requset->id);
+        $color = ProductDetail::create([
+            'product_id'=>$requset->id,
+            'color_code'=>$requset->color_code
+        ]);
+        Cache::tags('products')->flush();
+        return response()->json($color,200);
+    }
+
+    /*delete colour from product*/
+    public function deleteColour($id){
+        $color = ProductDetail::findOrFail($id);
+        $color->delete();
+        Cache::tags('products')->flush();
+        return response()->json('done',200);
     }
 }

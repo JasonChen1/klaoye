@@ -49186,6 +49186,7 @@ MIT (https://github.com/Wikiki/bulma-steps/blob/master/LICENSE)
 }
 
 .pagintaed-custom {
+  padding: 1rem 0 0 0;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -49217,4 +49218,13 @@ MIT (https://github.com/Wikiki/bulma-steps/blob/master/LICENSE)
   display: flex;
   flex-wrap: wrap;
   padding-right: 1.5rem;
+}
+
+.dropdown.is-hoverable:hover .dropdown-menu {
+  display: inherit;
+  margin-top: 0px;
+}
+
+tr.is-active {
+  background: #a4ffa3 !important;
 }

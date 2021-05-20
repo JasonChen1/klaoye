@@ -50,8 +50,12 @@ Route::prefix('admin')->group(function(){
 		// 刷新token
 		Route::get('refresh/token','Auth\Admin\AuthController@refreshToken');
 		// 商品
+		Route::post('products/{id}','ProductController@update');
 		Route::resource('products','ProductController');
+		Route::delete('product/image/{id}','ProductController@deleteImage');
 		Route::post('product/set','ProductController@setActive');
+		Route::post('product/colour','ProductController@addColour');
+		Route::delete('product/colour/{id}','ProductController@deleteColour');
 		// 地址
 		Route::resource('address','AdminAddressController',['as'=>'admin']);
 		// 订单
