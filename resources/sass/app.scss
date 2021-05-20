@@ -1,0 +1,116 @@
+// Fonts
+/*@import url('https://fonts.googleapis.co?m/css?family=Nunito');*/
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+@import "~bulma/sass/utilities/_all";
+// Set your colors
+$primary: #363636;
+$primary-invert: findColorInvert($primary);
+$twitter: #4099FF;
+$twitter-invert: findColorInvert($twitter);
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: (
+    "white": ($white, $black),
+    "black": ($black, $white),
+    "light": ($light, $light-invert),
+    "dark": ($dark, $dark-invert),
+    "primary": ($primary, $primary-invert),
+    "info": ($info, $info-invert),
+    "success": ($success, $success-invert),
+    "warning": ($warning, $warning-invert),
+    "danger": ($danger, $danger-invert),
+    "twitter": ($twitter, $twitter-invert)
+);
+
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
+@import '~@mdi/font/scss/materialdesignicons';
+
+.err,#card-errors{
+    color: red;
+}
+.notification{
+    padding: 0;
+    background-color: initial;
+}
+.auth-head{
+    color: #1d8c9f;
+}
+/*admin auth form*/
+.admin-form{
+    padding: 2rem;
+    border: 1px solid #e5e5e7;
+    background:#fff; 
+    border-radius: 5px;
+    width: 360px;
+}
+.admin-form-notification{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    vertical-align: middle;
+    align-items: center;
+}
+.admin-login-container{
+    background-size: cover;
+    overflow: hidden;
+}
+
+.toast{
+     flex-basis: initial;
+}
+
+.pagination-list{
+    a{
+        text-decoration: none !important;
+        &:hover{
+            border: 1px solid #363636;
+        }
+    }
+    .is-current {
+        color: #fff !important;
+    }
+
+}
+.pagintaed-custom{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    .paginate-text,
+    .paginate-text-right{
+        display: flex;
+        align-items: center;
+        padding: .5rem;
+        font-size: 11pt;
+        input{
+            width: 40px;
+            margin-left: .5rem;
+            margin-right: .5rem;
+        }
+    }
+    .pagination.is-centered{
+        margin-bottom: 0px;
+    }
+}
+
+.notification.is-success.is-top-right,
+.notification.is-danger.is-top-right{
+    padding: 1rem;
+    .media-content{
+        justify-content: center;
+        display: flex;
+        flex-wrap: wrap;
+        padding-right: 1.5rem;    
+    }
+}
