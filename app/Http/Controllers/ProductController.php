@@ -6,12 +6,15 @@ use App\Models\{Product,ProductImage,ProductDetail};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Product as ProductRequest;
+use App\Traits\HelperTrait;
 // use Carbon\Carbon;
 // use Excel;
 use Cache;
+use Image;
 
 class ProductController extends Controller
 {
+    use HelperTrait;
     /**
      * Display a listing of the resource.
      *
@@ -19,22 +22,10 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {       
-        $where = [];
-        $orderField = 'id';
-        $order = 'desc';
-        $filter = (array)json_decode($request->filter);
-
-        if(count($filter)>0){
-            foreach ($filter as $key => $value) {
-                if($key==='sortField'){
-                    $orderField = $value;
-                } else if($key==='sortOrder'){
-                    $order = $value;
-                } else{
-                    array_push($where, [$key,'like','%'.$value.'%']);
-                }
-            }
-            return Product::with(['details','images'])->where($where)->orderBy($orderField,$order)->paginate(10);
+        $filter = $this->filter($request);
+       
+        if($filter['filter']){
+            return Product::with(['details','images'])->where($filter['query'])->orderBy($filter['orderField'],$filter['order'])->paginate(10);
         }
 
         return Cache::tags(['products'])->rememberForever('products.all.page_'.$request->page.'_admin', function (){
@@ -64,6 +55,11 @@ class ProductController extends Controller
             foreach ($request->images as $image) {
                 $name = $image->getClientOriginalName();
                 $path = $image->storeAs('images',$name,'public');
+                
+                $image->storeAs('thumbnail/images', $name,'public');
+                $thumbnail = public_path('storage/thumbnail/images/'.$name);
+                $this->createThumbnail($thumbnail, 90, 90);
+
                 $img = new ProductImage([
                     'image_url'=>$path
                 ]);
@@ -73,6 +69,21 @@ class ProductController extends Controller
         }
         Cache::tags('products')->flush();
         return response()->json($prod->load(['details','images']),200);
+    }
+
+    /**
+     * Create a thumbnail of specified size
+     *
+     * @param string $path path of thumbnail
+     * @param int $width
+     * @param int $height
+     */
+    public function createThumbnail($path, $width, $height)
+    {
+        $img = Image::make($path)->resize($width, $height, function ($constraint) {
+            $constraint->aspectRatio();
+        });
+        $img->save($path);
     }
 
     /*remove product image*/
@@ -105,9 +116,9 @@ class ProductController extends Controller
     {
         $v = Validator::make($request->all(), [
             "name"=>'string|required',
-            "code" => 'required|string|exists:products,code',
+            "code" => 'required|string',//|exists:products,code',
             "price" => 'required|numeric',
-            "status" => 'nullable|integer',
+            "status" => 'nullable|string',
             "stock" => 'required|integer',
             "size" => 'nullable|string',
             "description"=> 'nullable|string',

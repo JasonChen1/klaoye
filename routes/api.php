@@ -45,17 +45,21 @@ Route::prefix('admin')->group(function(){
 	Route::post('password/reset', 'Auth\Admin\ResetPasswordController@callResetPassword');
 
 	Route::middleware(['auth:adminApi'])->group(function(){
-		// coupon
-		Route::resource('coupon','CouponController');
 		// 刷新token
 		Route::get('refresh/token','Auth\Admin\AuthController@refreshToken');
 		// 商品
-		Route::post('products/{id}','ProductController@update');
 		Route::resource('products','ProductController');
+		Route::post('products/{id}','ProductController@update');
 		Route::delete('product/image/{id}','ProductController@deleteImage');
 		Route::post('product/set','ProductController@setActive');
 		Route::post('product/colour','ProductController@addColour');
 		Route::delete('product/colour/{id}','ProductController@deleteColour');
+		// categories
+		Route::resource('categories','CategoryController');
+		Route::get('categories/all','CategoryController@all');
+		Route::delete('subcategories/{id}','CategoryController@destroySubCategory');
+		// coupon
+		Route::resource('coupon','CouponController');
 		// 地址
 		Route::resource('address','AdminAddressController',['as'=>'admin']);
 		// 订单

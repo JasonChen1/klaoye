@@ -14,6 +14,14 @@
                         <i class="ivu-icon ivu-icon-ios-book"></i>
                         <span>Dashboard</span>
                     </li> 
+
+                    <li class="ivu-menu-item" 
+                        @click="activeTab='category'" 
+                        :class="activeTab==='category'?'anav-active':''">
+                        <i class="ivu-icon ivu-icon-ios-book"></i>
+                        <span>Categories</span>
+                    </li> 
+
                     <li class="ivu-menu-item" 
                         @click="activeTab='product'" 
                         :class="activeTab==='product'?'anav-active':''">
@@ -80,6 +88,9 @@
                     <div v-if="activeTab==='dashboard'">
                         <v-data-analytics-board></v-data-analytics-board>
                     </div>
+                    <div v-if="activeTab==='category'">
+                        <v-category-table></v-category-table>
+                    </div>
                     <div v-if="activeTab==='product'">
                         <v-product-table></v-product-table>
                     </div>
@@ -100,12 +111,13 @@
 
 <script>
     import {Breadcrumb,BreadcrumbItem,Sider,Layout,MenuItem,Icon,Header,Content} from 'view-design';
-    import logo from '@images/logo.jpg';
+    import logo from '@images/logo.png';
     import DataAnalytics from './dataAnalytics'
     import ProductTable from './productTable'
     import Order from './order'
     import Enquiries from './enquiries'
     import Coupon from './coupon'
+    import CategoryTable from './category'
 
     export default {
         name: 'Dashboard',
@@ -119,6 +131,7 @@
             Header,
             Content,
             'v-data-analytics-board':DataAnalytics,
+            'v-category-table':CategoryTable,
             'v-product-table':ProductTable,
             'v-order':Order,
             'v-enquiries':Enquiries,            
@@ -133,6 +146,7 @@
                 activeTab:'product',//default tab
                 breadcrumbList:{
                     'dashboard':'Dashboard',
+                    'category':'Categories',
                     'product':'Products',
                     'order':'Orders',
                     'enquiry':'Enquiries',

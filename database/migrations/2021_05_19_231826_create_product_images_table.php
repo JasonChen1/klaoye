@@ -16,7 +16,7 @@ class CreateProductImagesTable extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->nullable()->constrained('products')->onDelete('cascade');
-            $table->string('image_url',50)->nulllable();
+            $table->string('image_url',100)->nulllable();
             $table->timestamps();
         });
     }

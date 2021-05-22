@@ -9,14 +9,14 @@
                     </span>
                 </b-upload>
             </b-field> -->
-            <b-button type="is-info" @click="addProduct">
+            <b-button type="is-info" @click.prevent="productAction(null,'add')">
                 <b-icon icon="plus" size="is-small"></b-icon>
                 <span >Add Product</span>
             </b-button>
         </div>
-        <div class="progress-wp" v-if="progressVal>0">
+        <!-- <div class="progress-wp" v-if="progressVal>0">
             <b-progress type="is-success" :value="progressVal" show-value format="percent" ></b-progress>
-        </div>
+        </div> -->
         <b-notification :closable="false">
             <b-table
                 class="prod-table"
@@ -42,7 +42,7 @@
                 :checked-rows.sync="checkedRows"
                 :is-row-checkable="(row) => row.id"
 
-                :row-class="(row, index) => row.status === 1 && 'is-active'"
+                :row-class="(row, index) => row.status === 0 && 'is-inactive'"
                 >
 
                 <b-table-column field="code" label="Code" sortable searchable v-slot="props">
@@ -52,8 +52,8 @@
                     <span class="pl-2" v-html="props.row.name"></span>
                     <div class="images-wp">
                         <div v-for="(img,i) in props.row.images">
-                            <span class="cursor" @click="activeImageModal(img.image_url)">
-                                <img :src="`/storage/${img.image_url}`" :alt="props.row.name" >
+                            <span class="cursor" @click="activeImageModal(img.image_url)" v-lazy-container="{ selector: 'img' }">
+                                <img :data-src="`/storage/thumbnail/${img.image_url}`" :alt="props.row.name" >
                             </span>
                         </div>
                     </div>
@@ -67,7 +67,11 @@
                 <b-table-column field="description" label="Description" width="120" sortable searchable v-slot="props">
                     <span v-html="props.row.description"></span>
                 </b-table-column>
-                <b-table-column field="details" label="Details" searchable v-slot="props">
+                <b-table-column field="details" label="Details" searchable v-slot="props" width="160">
+                    <div class="mb-2">
+                        <p><strong>Category:</strong>{{ props.row.category_name }}</p>
+                        <p><strong>Sub-Category:</strong> {{ props.row.sub_category_name }}</p>
+                    </div>
                     <div class="color-block-wp">
                         <Poptip placement="top" width="200" word-wrap v-for="(color,i) in props.row.details" :key="i" v-if="props.row.details.length>0">
                             <div class="color-block" :style="`background: ${color.color_code}`">
@@ -96,7 +100,7 @@
                         </template>
 
                         <b-dropdown-item aria-role="listitem" @click.prevent.native="activeProduct(props.row,props.row.status==1?0:1)"> {{props.row.status==1? 'Inactive':'Active'}}</b-dropdown-item>
-                        <b-dropdown-item aria-role="listitem" icon-left="pencil-outline" @click.prevent.native="editProduct(props.row)">Edit</b-dropdown-item>
+                        <b-dropdown-item aria-role="listitem" icon-left="pencil-outline" @click.prevent.native="productAction(props.row,'edit')">Edit</b-dropdown-item>
                         <b-dropdown-item aria-role="listitem" icon-left="trash-can-outline" @click.prevent.native="deleteProduct(props.row,props.index)">Delete</b-dropdown-item>
                     </b-dropdown>
                 </b-table-column>
@@ -141,8 +145,8 @@
         </b-modal>
 
         <b-modal :active.sync="showImageModal"  v-if="imageUrl">
-            <p class="image">
-                <img :src="imageUrl">
+            <p class="image"  v-lazy-container="{ selector: 'img' }">
+                <img :data-src="imageUrl">
             </p>
         </b-modal>
 
@@ -159,53 +163,92 @@
                 </header>
                 <section class="modal-card-body">
                     <form v-if="modalType!=='delete'">
-                        <div class="form-input">
-                            <b-field label="Code">
-                                <b-input type="text" class="" v-model="form.code"  @keyup="errors.code=''" placeholder="Code" required></b-input>
-                            </b-field>
-                            <span class="err d-flex" v-if="errors.code" >
-                                {{errors.code[0]}}
-                            </span>
+                        <div class="form-row">
+                            <div class="col">
+                                <b-field label="Code">
+                                    <b-input type="text" class="" v-model="form.code"  @keyup="errors.code=''" placeholder="Code" required></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.code" >
+                                    {{errors.code[0]}}
+                                </span>
+                            </div>
+                            <div class="col">
+                                <b-field label="Name">
+                                    <b-input type="text" class="" v-model="form.name"  @keyup="errors.name=''" placeholder="Name" required></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.name" >
+                                    {{errors.name[0]}}
+                                </span>
+                            </div>
                         </div>
-                        <div class="form-input">
-                            <b-field label="Name">
-                                <b-input type="text" class="" v-model="form.name"  @keyup="errors.name=''" placeholder="Name" required></b-input>
-                            </b-field>
-                            <span class="err d-flex" v-if="errors.name" >
-                                {{errors.name[0]}}
-                            </span>
+                        <div class="form-row">
+                            <div class="col">
+                                <b-field label="Select a Category">
+                                    <b-autocomplete
+                                        v-model="categoryName"
+                                        placeholder="Categories"
+                                        :keep-first="false"
+                                        :open-on-focus="true"
+                                        :data="filterCategories"
+                                        field="name"
+                                        @select="option => (selectedCategory = option)"
+                                        :clearable="false"
+                                    >
+                                    </b-autocomplete>
+                                </b-field>
+                            </div>
+                            <div class="col" >
+                                <b-field label="Select a Sub-Category">
+                                    <b-autocomplete
+                                    v-if="selectedCategory"
+                                        v-model="subCategoryName"
+                                        placeholder="Sub-Categories"
+                                        :keep-first="false"
+                                        :open-on-focus="true"
+                                        :data="filterSubCategories"
+                                        field="name"
+                                        @select="option => (selectedSubCategory = option)"
+                                        :clearable="false"
+                                    >
+                                    </b-autocomplete>
+                                </b-field>
+                            </div>
                         </div>
-                        <div class="form-input">
-                            <b-field label="Price">
-                                <b-input type="text" class="" v-model="form.price"  @keyup="errors.price=''" placeholder="Price" required></b-input>
-                            </b-field>
-                            <span class="err d-flex" v-if="errors.price" >
-                                {{errors.price[0]}}
-                            </span>
+                        <div class="form-row">
+                            <div class="col">
+                                <b-field label="Price">
+                                    <b-input type="text" class="" v-model="form.price"  @keyup="errors.price=''" placeholder="Price" required></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.price" >
+                                    {{errors.price[0]}}
+                                </span>
+                            </div>
+                            <div class="col">
+                                <b-field label="Discount">
+                                    <b-input type="text" class="" v-model="form.discount"  @keyup="errors.discount=''" placeholder="Discount" required></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.discount" >
+                                    {{errors.discount[0]}}
+                                </span>
+                            </div>
                         </div>
-                        <div class="form-input">
-                            <b-field label="Discount">
-                                <b-input type="text" class="" v-model="form.discount"  @keyup="errors.discount=''" placeholder="Discount" required></b-input>
-                            </b-field>
-                            <span class="err d-flex" v-if="errors.discount" >
-                                {{errors.discount[0]}}
-                            </span>
-                        </div>
-                        <div class="form-input">
-                            <b-field label="size">
-                                <b-input type="text" class="" v-model="form.size"  @keyup="errors.size=''" placeholder="size"></b-input>
-                            </b-field>
-                            <span class="err d-flex" v-if="errors.size" >
-                                {{errors.size[0]}}
-                            </span>
-                        </div>
-                        <div class="form-input">
-                            <b-field label="Stock">
-                                <b-input type="text" class="" v-model="form.stock"  @keyup="errors.stock=''" placeholder="Stock" required></b-input>
-                            </b-field>
-                            <span class="err d-flex" v-if="errors.stock" >
-                                {{errors.stock[0]}}
-                            </span>
+                        <div class="form-row">
+                            <div class="col">
+                                <b-field label="size">
+                                    <b-input type="text" class="" v-model="form.size"  @keyup="errors.size=''" placeholder="size"></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.size" >
+                                    {{errors.size[0]}}
+                                </span>
+                            </div>
+                            <div class="col">
+                                <b-field label="Stock">
+                                    <b-input type="text" class="" v-model="form.stock"  @keyup="errors.stock=''" placeholder="Stock" required></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.stock" >
+                                    {{errors.stock[0]}}
+                                </span>
+                            </div>
                         </div>
                         <div class="form-input">
                             <b-field label="Description">
@@ -346,6 +389,10 @@
                 // form
                 uploads:[],
                 form: new Form({
+                    category_id:'',
+                    sub_category_id:'',
+                    category_name:'',
+                    sub_category_name:'',
                     code:'',
                     name:'',
                     price:'',
@@ -363,6 +410,11 @@
                 }),
                 index:null,
                 colorErrors:[],
+                // autocomplete
+                selectedCategory:false,
+                selectedSubCategory:false,
+                categoryName:'',
+                subCategoryName:'',
                 // import
                 file:null,
                 productDescription:null,
@@ -372,10 +424,13 @@
                 progressVal:0,
                 // bulk edit
                 radio:null,
+                // categories
+                categories:[],
             }
         },
         created(){
-            this.loadData()
+            this.loadData()  
+            this.loadCategories()
         },
         watch:{
             // file(){
@@ -391,12 +446,44 @@
                     : value
             }
         },
+        computed: {
+            filterCategories() {
+                return this.categories.filter(option => {
+                    return (
+                        option.name
+                        .toString()
+                        .toLowerCase()
+                        .indexOf(this.categoryName.toLowerCase()) >= 0
+                        )
+                })
+            },
+            filterSubCategories(){
+                if(this.selectedCategory){
+                    return this.selectedCategory.subcategories.filter(option => {
+                        return (
+                            option.name
+                            .toString()
+                            .toLowerCase()
+                            .indexOf(this.subCategoryName.toLowerCase()) >= 0
+                            )
+                    })
+                }else{
+                    return ''
+                }
+            }
+        },
         methods:{
+            loadCategories(){
+                axios.get('/api/admin/categories/all')
+                .then(res=>{
+                    this.categories = res.data
+                })
+            },
             previewImg(file,editUpload){
                 if(this.modalType==='add'|| editUpload){
                     return URL.createObjectURL(file)
                 }else{
-                    return window.location.href.replace(window.location.pathname,`/storage/${file.image_url}`)
+                    return window.location.href.replace(window.location.pathname,`/storage/thumbnail/${file.image_url}`)
                 }
             },
             removeImg(index,editUpload){
@@ -531,26 +618,32 @@
             toggle(row) {
                 this.$refs.table.toggleDetails(row)
             },
-            addProduct(){
-                this.modalType = 'add'
-                this.modalTitle = "Add Product"
-                this.modalBtn = 'Add'
-                this.showModal = true
-                Object.keys(this.form).map(field=>{
-                    this.form[field] = ''
-                })
-                this.form.images=[]
-            },
-            editProduct(row){
-                this.modalType = 'edit'
-                this.modalTitle = "Edit Product"
-                this.modalBtn = 'Edit'
-                this.row = row
-                this.uploads = []
-                Object.keys(row).map(field=>{
-                    this.form[field] = row[field]
-                })
-                this.showModal = true
+            productAction(row, type){
+                switch(type){
+                    case "add":
+                    this.modalType = 'add'
+                    this.modalTitle = "Add Product"
+                    this.modalBtn = 'Add'
+                    this.showModal = true
+                    this.form.images = []
+                    this.uploads = []
+                    break
+                    case "edit":
+                    this.modalType = 'edit'
+                    this.modalTitle = "Edit Product"
+                    this.modalBtn = 'Edit'
+                    this.row = row
+                    this.uploads = []
+                    this.selectedCategory=false
+                    this.selectedSubCategory=false
+                    this.categoryName=''
+                    this.subCategoryName=''
+                    Object.keys(row).map(field=>{
+                        this.form[field] = row[field]
+                    })
+                    this.showModal = true
+                    break
+                }
             },
             deleteProduct(row,index){
                 this.index = index
@@ -592,11 +685,18 @@
                 if(this.modalType==='edit'){
                     this.form.images = this.uploads
                 }
-
+                if(this.selectedCategory){
+                    this.form.category_name = this.selectedCategory.name
+                    this.form.category_id = this.selectedCategory.id
+                }
+                if(this.selectedSubCategory){
+                    this.form.sub_category_name = this.selectedSubCategory.name
+                    this.form.sub_category_id = this.selectedSubCategory.id
+                }
                 this.form.submit(action,`/api/admin/products${query}`,this.modalType==='delete'?false:true)
                 .then(res=>{
                     if(this.modalType==='add'){
-                        this.tableData.push(res)
+                        this.tableData.unshift(res)
                     }else if(this.modalType==='edit'){
                         Object.keys(this.row).map(field=>{
                             this.row[field] = res[field]
@@ -614,6 +714,7 @@
                     this.toastType = 'is-danger'
                 })
                 .finally(res=>{
+                    this.selectedCategory = null
                     this.$buefy.notification.open({
                         duration: 3000,
                         message: this.toastMessage,
@@ -751,10 +852,7 @@
     .color-card-body{
         min-height: 400px;
     }
-    .feature-wp{
-        display: flex;
-        padding: 1rem;
-    }
+    
     .form-input{
         margin-bottom: 1rem;
     }

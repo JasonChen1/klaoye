@@ -17,7 +17,7 @@ class Product extends Model
      * @var array
      */
     protected $fillable = [
-    	'code','name','price','status','description','size','stock','discount',
+    	'code','name','price','status','description','size','stock','discount','category_id','sub_category_id','category_name','sub_category_name',
     ];
 
     public function details(){
@@ -26,5 +26,13 @@ class Product extends Model
 
     public function images(){
         return $this->hasMany('App\Models\ProductImage');
+    }
+
+    public function category(){
+        return $this->belongsTo('App\Models\Category');
+    }
+
+    public function subcategory(){
+        return $this->belongsTo('App\Models\SubCategory');
     }
 }

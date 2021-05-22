@@ -121,6 +121,17 @@ $link-focus-border: $primary;
     margin-top: 0px;
 }
 
-tr.is-active {
-    background: #a4ffa3 !important;
+tr.is-inactive {
+    background: #848686 !important;
+    color: #fff;
+}
+.feature-wp{
+    display: flex;
+    padding: 1rem;
+}
+.collapse.card{
+    display: block;
+}
+td{
+    vertical-align: middle !important;
 }

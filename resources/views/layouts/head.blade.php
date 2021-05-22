@@ -7,5 +7,5 @@
 <title>KALOYE</title>
 
 <!-- Fonts -->
-
+<link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico"/>
 <link href="{{ mix('css/app.css') }}" rel="stylesheet" async>
