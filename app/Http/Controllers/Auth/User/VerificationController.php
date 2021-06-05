@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth\User;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Http\Request;
+use App\Models\User;
 
 class VerificationController extends Controller
 {
@@ -55,14 +57,13 @@ class VerificationController extends Controller
                         ? new Response('', 204)
                         : redirect($this->redirectPath());
         }
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
-        }
+
+        $request->user()->markEmailAsVerified();
 
         if ($response = $this->verified($request)) {
             return $response;
         }
-
+        
         return $request->wantsJson()
                     ? new Response('', 204)
                     : redirect($this->redirectPath())->with('verified', true);
@@ -75,8 +76,8 @@ class VerificationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('signed')->only('verify');
-        $this->middleware('throttle:6,1')->only('verify', 'resend');
+        // $this->middleware('auth');
+        // $this->middleware('signed')->only('verify');
+        // $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 }

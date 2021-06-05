@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-
+use App\Models\{Category,SubCategory,Product,ProductImage,ProductDetail};
 
 class ShopController extends Controller
 {
@@ -33,5 +33,9 @@ class ShopController extends Controller
 		return ob_get_clean();
 	}
 
+
+	public function categories(){
+		return Category::with(['subcategories'])->get();
+	}
 
 }

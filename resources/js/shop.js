@@ -6,3 +6,4 @@ export default new Vue({
 	router,
 	render: h => h(App)
 });
+

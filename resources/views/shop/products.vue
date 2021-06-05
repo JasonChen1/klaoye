@@ -1,15 +1,26 @@
 <template>
     <div >
-        {{ message }}
-    	<router-link :to="{ name: 'Home' }">HOME</router-link>
+        products page
+    	<router-link :to="{ name: 'HOME' }">HOME</router-link>
     </div>
 </template>
 <script>
     export default {
+        name: 'Products',
         data() {
-          return {
-            message: 'products page'
+            return {
+                windowWidth:0,
+            }
+        },
+        mounted(){
+           
+        },
+        computed:{
+           
+        },
+        methods:{
+
         }
     }
-}
+
 </script>

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('categories','ShopController@categories');
+
 
 // 用户
 Route::prefix('user')->group(function(){

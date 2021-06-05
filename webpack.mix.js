@@ -24,7 +24,8 @@ mix.webpackConfig({
             '@user': path.resolve('resources/views/auth/user'),
             '@admin': path.resolve('resources/views/auth/admin'),
             '@layout': path.resolve('resources/views/layouts'),
-        }
+            'vue$': 'vue/dist/vue.runtime.common.js',
+        },
     }
 });
 
@@ -35,14 +36,6 @@ mix
     .vue()
     .sass('resources/sass/app.scss', 'public/css');
 
-
-mix.webpackConfig({
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.runtime.common.js'
-    }
-  }
-});
 
 if (mix.inProduction()) {
 	mix.version()

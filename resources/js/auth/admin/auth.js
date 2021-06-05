@@ -3,7 +3,6 @@ var VueCookie = require('vue-cookie');
 Vue.use(VueCookie);
 const SET_LOGIN = "SET_LOGIN";
 const SET_LOGOUT = "SET_LOGOUT";
-const SET_TOKEN = "SET_TOKEN";
 
 export default {
 	state: {

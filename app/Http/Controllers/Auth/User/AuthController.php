@@ -28,7 +28,7 @@ class AuthController extends Controller
     	$request->validate([
     		'name' => 'required|string',
     		'email' => 'required|string|email|unique:users',
-    		'password' => 'required|string|confirmed'
+    		'password' => 'required|string|confirmed|min:8'
     	]);
 
     	$user = User::create([
@@ -96,8 +96,6 @@ class AuthController extends Controller
     	$tokenResult = $user->createToken('Personal Access Token');
     	$token = $tokenResult->token;
     	$token->save();
-        $domain = $request->getHttpHost();
-        $admin = Admin::where('domain',$domain)->first();
   
     	return response()->json([
     		'access_token' => $tokenResult->accessToken,
@@ -106,7 +104,6 @@ class AuthController extends Controller
     			$tokenResult->token->expires_at
     		)->toDateTimeString(),
     		'user' => $user,
-            'currency'=>$admin->currency??null,
     	],201);
     }
 

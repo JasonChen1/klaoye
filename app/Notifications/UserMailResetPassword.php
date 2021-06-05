@@ -41,7 +41,7 @@ class UserMailResetPassword extends ResetPassword implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $link = url( "/user/password/reset/".$this->token);
+        $link = url( "/password/reset/".$this->token);
         return (new MailMessage)
         ->subject( 'Reset Password Notification' )
         ->line( "Hello! You are receiving this email because we received a password reset request for your account." )
