@@ -46,6 +46,16 @@ f<template>
                                     Sitemap
                                 </a>
                             </li>
+                            <li>
+                                <router-link  class="footer-link" :to="`/private-policy`" >
+                                    Private Policy
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link  class="footer-link" :to="`/faq-shipping`" >
+                                    FAQ Shipping
+                                </router-link>
+                            </li>
                         </ul>
                     </collapsible>
                     <collapsible :isMobile="isMobile" title="Social Media" >

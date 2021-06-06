@@ -339,9 +339,324 @@ ul{
 .carousel-item{
     display: block;
     img{
-        height: 50vh;
+        height: 50%;
     }
 }
 .carousel-wp{
     margin-top: 4.5rem;
+}
+/*magnifier*/
+.image-magnifier img{
+    max-width: none;
+}
+.hide-zoomer{
+    display: none;
+}
+.shop-color-wp{
+    display: flex;
+    align-items: center;
+    .cb{
+        cursor: pointer;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        margin: .2rem;
+        &:hover{
+            border:2px solid #000;
+        }
+    }
+}
+.color-active{
+    border:2px solid #000;
+}
+.magnifier-wp{
+    display: flex;
+    justify-content: space-evenly;
+    .details{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1rem;
+        .des-wp div{
+            padding-top: .5rem;
+            display: flex;
+        }
+    }
+}
+@media (max-width: 1100px){
+    .magnifier-wp{
+        display: contents;
+    }
+}
+.details-wp{
+    min-height: 500px;
+}
+/*details page*/
+.add-cart-btn,.buy-btn{
+    border: 1px solid #000;
+    border-radius: 0;
+    &:hover{
+        color: #fff;
+        background: #000;
+    }
+}
+.prod-description-wp{
+    margin-top: 2rem;
+}
+/*product page*/
+.mb-pagination{
+    flex-direction: column;
+    align-items: center;
+}
+.category-select{
+    max-width: 247px;
+}
+.category-filter-list{
+    display: flex;
+    padding: .3rem .3rem .3rem 1.5rem;
+}
+.menu{
+    .menu-label{
+        font-size: 12pt;
+        font-weight: bold;
+    }
+    .menu-list{
+        a{
+            &.is-active{
+                background-color: #1d8c9f;
+            }
+        }
+    }
+}
+.left-filter{
+    max-width: 275px;
+    padding-left: 1.3rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-view{
+    display: inline-block !important;
+    width: 100%;
+    .product-block-wp{
+        position: relative;
+        max-width: 100%;
+        flex-direction: row;
+        min-height:auto;
+        .product{
+            display: flex;
+            width: 100%;
+            .product-text{
+                justify-content: flex-start;
+                padding-left: 1rem;
+                width: 100%;
+                .product-text-content{
+                    justify-content: flex-start;
+                    .tags{
+                        padding-right: 1rem;
+                    }
+                }
+                .product-content-name{
+                    padding: 0;
+                }
+            }
+        }
+        .prod-btn-wp{
+            position: absolute;
+            bottom: 1.5rem;
+            left: calc(1rem + 204px);
+        }
+
+    }
+}
+.mb-filter-wp{
+    padding:  2rem .5rem .5rem .75rem;
+    .filter-list{
+        display: flex;
+        select{
+            min-width: 100px;
+        }
+    }
+    select{
+        height: 100%;
+    }
+}
+.filter-wp{
+    padding: 1.3rem;
+    display: flex;
+    justify-content: space-between;
+    .filter{
+        align-items: center;
+        display: flex;
+    }
+    .filter-list{
+        display: flex;
+        select{
+            min-width: 100px;
+        }
+    }
+}
+.products-wp{
+    position: relative;
+    .home-prod-wp-mb{
+        /*justify-content: flex-start;*/
+    }
+    .paginate-text,
+    .paginate-text-right{
+        padding: 0.1rem;
+        font-size: 10pt;
+    }
+}
+
+.filter-left-mb{
+    .dropdown-filter-wp{
+        padding: .75rem;
+    }
+    .dropdown{
+        width: 100%;
+        .dropdown-trigger{
+            width: 100%;
+            border: 1px solid #000;
+            display: flex;
+            justify-content: center;
+        }
+    }
+}
+/*product cart*/
+.home-prod-wp{
+    display: flex;
+    flex-wrap: wrap;
+}
+.tg{
+    margin-bottom: 0rem !important;
+}
+.pw-ds{
+    padding-right: 1rem;
+    color: red;
+}
+.colors-wp{
+    display: flex;
+    padding-bottom: 1rem;
+    .color-tag{
+        padding: 1rem;
+        border-radius: 50%;
+        margin-right: .2rem;
+    }
+}
+.img-wp{
+    position: relative;
+    overflow: hidden;
+}
+.overlay-content{
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    .icon-white{
+        color: #fff;
+        padding: .5rem;
+    }
+}
+.prod-overlay{
+    position: absolute;
+    z-index: 9;
+    bottom: .2rem;
+    left: .2rem;
+    right: .2rem;
+    background: rgba(90, 90, 90, 0.80);
+    overflow: hidden;
+    height: 0;
+    -webkit-transition: .2s ease;
+    transition: .2s ease;
+}
+.product-block-wp-mb:hover .prod-overlay {
+    height: 98%;
+}
+.product-text-content{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.product-block-wp{
+    margin: .15rem;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 1.5rem;
+    max-width: 254px;
+    /*min-height: 460px;*/
+    justify-content: space-between;
+    border: 1px solid #e4e4e4;
+    &:hover{
+        box-shadow: 0 0 .3rem #515a6e;
+    }
+}
+.product-block-wp-mb{
+    position: relative;
+    padding: .2rem;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    min-height: 280px;
+    img{
+        width: 160px;
+    }
+}
+.prod-btn-wp{
+    max-width: 204px;
+}
+.product-text-mb{
+    max-width: 160px;
+}
+.product-text,
+.product-text-mb{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.product-content-name{
+    font-size: 9pt;
+    padding: 1rem 0 1rem 0;
+}
+.product{
+    padding: 0;
+    overflow: hidden;
+}
+.product figure{
+    position: relative;
+    overflow: hidden;
+}
+.product figure img{
+    display: block;
+    width: 100%;
+    -webkit-transition: all 1s linear;
+    -o-transition: all 1s linear;
+    transition: all 1s linear;
+}
+.product figure:hover:after{
+    opacity: 0;
+}
+.product figure:hover img{
+    -webkit-transform: scale(1.4);
+    transform: scale(1.4);
+}
+.product figure:hover .product-title{
+    top:30px;
+    opacity: 0;
+}
+.product figure:hover .product-category{
+    opacity: 0;
+    letter-spacing: 2em;
+}
+.list-view{
+    .figure{
+        width: 200px;
+        height: 200px;
+    }
+    img{
+        width: 200px;
+        height: 200px;
+    }
 }

@@ -30,14 +30,8 @@ export default {
 						state.carts[i]['num'] +=1
 						subTotal = state.carts[i]['num']*state.carts[i].price
 						if(state.carts[i].discount){
-							if (state.carts[i].discount.includes('%')) {
-								percent = state.carts[i].discount.split('%')[0]/100;
-								discount = subTotal*percent
-								discountTotal = subTotal-discount
-							}else{
-								discount = state.carts[i].discount*state.carts[i]['num']
-								discountTotal = subTotal - discount
-							}
+							discount = state.carts[i].discount*state.carts[i]['num']
+							discountTotal = subTotal - discount	
 						}
 						if(data.color_code){
 							state.carts[i]['color_code'] = data.color_code
@@ -54,14 +48,8 @@ export default {
 				data['num'] = 1
 				data['subtotal'] = data.price
 				if(data.discount){
-					if (data.discount.includes('%')) {
-						percent = data.discount.split('%')[0]/100;
-						discount = data.price*percent
-						discountTotal = data.price-discount
-					}else{
-						discount = data.discount*data.num
-						discountTotal = data.price - discount
-					}
+					discount = data.discount*data.num
+					discountTotal = data.price - discount
 
 					data['discount_total'] = discountTotal.toFixed(2)
 					data['discounted'] = (data.price - discount).toFixed(2)
@@ -159,9 +147,9 @@ export default {
 		},
 		userCart({commit,getters}){
 			return new Promise((resolve,reject)=>{
-				axios.get(`/api/cart`)
+				axios.get(`/api/user/cart`)
 				.then(res=>{
-					commit(USER_CART,res.data.data.length)
+					commit(USER_CART,res.data)
 					resolve('success')
 				})
 				.catch(err=>{

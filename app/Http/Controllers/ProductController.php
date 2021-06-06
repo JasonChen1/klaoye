@@ -141,6 +141,10 @@ class ProductController extends Controller
                     'image_url'=>$path
                 ]);
 
+                $image->storeAs('thumbnail/images', $name,'public');
+                $thumbnail = public_path('storage/thumbnail/images/'.$name);
+                $this->createThumbnail($thumbnail, 90, 90);
+
                 $prod->images()->save($img);
             }
         }

@@ -1,12 +1,12 @@
 <template>
     <div>
-    	<v-header :categories="categories" :isMobile="isMobile"></v-header>
+    	<v-header :categories="categories" :isMobile="isMobile" :reload="reload"></v-header>
 
     	<div v-if="$route.name==='HOME'" :class="isMobile?' container-mb':'container-df'">
-    		<router-view/>	
+    		<router-view :isMobile="isMobile"/>	
     	</div>
     	<div v-else class="container" :class="isMobile?'container-mb':'container-df'">
-    		<router-view/>
+    		<router-view :isMobile="isMobile" @reloadHeader="reloadHeader"/>
     	</div>
     	<v-footer :categories="categories" :isMobile="isMobile"></v-footer>
     </div>
@@ -25,6 +25,7 @@
 				categories:[],
 				loadingBar:'',
 				windowWidth:0,
+				reload:0,
 			}
 		},
 		computed:{
@@ -42,6 +43,9 @@
             this.getCategories()
         },
         methods:{
+        	reloadHeader(){
+        		this.reload++
+        	},
 	        getFontendData(){
 	        	// if(this.socialList.length<1){
 	        	// 	axios.get(`/api/frontend/data`)

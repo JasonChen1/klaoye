@@ -42,7 +42,7 @@
                                                 <template slot-scope="props">
                                                     <div class="media">
                                                         <div class="media-left" v-lazy-container="{ selector: 'img' }">
-                                                            <img width="32" :data-src="`https://ximiphoto.oss-cn-hangzhou.aliyuncs.com/thumb/${props.option.code}.jpg?x-oss-process=style/45`">
+                                                            <img width="32" :data-src="`/storage/thumbnail/${props.option.images[0].image_url}`">
                                                         </div>
                                                         <div class="media-content" v-html="props.option.name"></div>
                                                     </div>
@@ -78,9 +78,8 @@
                     </b-sidebar>
                 </div>
             </template>
-            <template slot="start" >
-                <!-- empty -->
-            </template>
+            <!-- <template slot="start" >
+            </template> -->
             <template slot="end">
                 <b-navbar-item tag="div">
                     <b-field label="">
@@ -96,7 +95,7 @@
                             <template slot-scope="props">
                                 <div class="media">
                                     <div class="media-left" v-lazy-container="{ selector: 'img' }">
-                                        <img width="32" :data-src="`https://ximiphoto.oss-cn-hangzhou.aliyuncs.com/thumb/${props.option.code}.jpg?x-oss-process=style/45`">
+                                        <img width="32" :data-src="`/storage/thumbnail/${props.option.images[0].image_url}`">
                                     </div>
                                     <div class="media-content" v-html="props.option.name"></div>
                                 </div>
@@ -105,11 +104,11 @@
                     </b-field>
                 </b-navbar-item>
                 <b-navbar-item tag="div">
-                    <router-link class="custom-cart" to="/cart" icon="cart">
+                    <router-link class="custom-cart" to="/cart" icon="cart" >
                         <b-icon icon="cart" size="is-medium"></b-icon>
                         VIEW CART
-                        <span class="dot" v-if="!isLogin">1</span>
-                        <span class="dot" v-else> 1</span>
+                        <span class="dot" v-if="!isLogin" >{{cart}}</span>
+                        <span class="dot" v-else > {{cart}}</span>
                     </router-link>
                 </b-navbar-item>
                 <b-navbar-item tag="router-link" :to="{ path: '/register' }" v-if="!isLogin">
@@ -149,7 +148,7 @@
             </b-navbar-item>
            
         </div>
-        <div class="top-offset container" :class="isMobile?'container-mb':'container-df'" v-if="$route.name!=='HOME'">
+        <div class="top-offset container" v-if="$route.name!=='HOME'">
             <v-breadcrumb class="p-3"  >
                 <BreadcrumbItem to="/">HOME</BreadcrumbItem>
                 <BreadcrumbItem :to="path" style="text-transform: uppercase;">{{pathName!=='HOME'?pathName:''}}</BreadcrumbItem>
@@ -171,6 +170,9 @@
             isMobile:{
                 type:Boolean,
                 required:true
+            },
+            reload:{
+                type:Number,
             }
         },
 		components: {
@@ -188,15 +190,22 @@
                 // autocomplete - search
                 isFetching: false,
                 searchableProducts:[],
-                selected:'',
-                searchMultipleText:'', 
+                selected:'', 
                 isLogin:false,
+                // cart
+                cart:0,
             }
         },
         mounted(){
             this.pathName = this.$route.name
             this.loadingBar = window.loading
             this.isLogin = this.$store.getters.isLoggedIn
+            if(this.isLogin){
+                this.$store.dispatch('userCart')
+                this.cart = this.$store.getters.userCarts
+            }else{
+                this.cart = this.$store.getters.carts.length
+            }
         },
         watch:{
             $route(to, from) {
@@ -215,10 +224,16 @@
             selected(){
                 let uri = `/search/${this.selected.id}`
                 this.$router.push(uri)
+                this.sidebarOpen = false
             },
             searchText(){
-                if(this.searchText){
-                    this.getProductList()
+                this.getProductList()
+            },
+            reload(){
+                if(this.isLogin){
+                    this.cart = this.$store.getters.userCarts
+                }else{
+                    this.cart = this.$store.getters.carts.length
                 }
             }
         },
@@ -245,32 +260,18 @@
                     }
                 })
             },
-            searchMultiple(){
-                if(this.searchMultipleText){
-                    if(this.$route.query.text!==this.searchMultipleText){
-                        this.$router.push(`/search?text=${this.searchMultipleText}`)
-                    }
-                }
-            },
             getProductList(){
-                this.isFetching = true
-                if(this.searchableProducts.length<1){
-                    axios.get('/api/search')
-                    .then(res=>{
-                        this.searchableProducts = res.data
-                    })
-                    .catch(err=>{})
-                    .finally(()=>{
-                        this.isFetching = false
-                    })
-                }else{
-                    this.isFetching = false
-                }
-            },
-            searchKeyWord(){
                 if(this.searchText){
-                    if(this.$route.path.split('/').pop()!==this.searchText){
-                        this.$router.push(`/search/${this.searchText}`)
+                    if(this.searchText.length>2){
+                        this.isFetching = true
+                        axios.get(`/api/search?text=${this.searchText}`)
+                        .then(res=>{
+                            this.searchableProducts = res.data
+                        })
+                        .catch(err=>{})
+                        .finally(()=>{
+                            this.isFetching = false
+                        })
                     }
                 }
             },

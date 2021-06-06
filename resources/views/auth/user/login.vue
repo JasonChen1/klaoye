@@ -93,11 +93,13 @@
                     remember_me: this.remember
                 })
                 .then(res=>{
+                    this.$store.dispatch('userCart')
                     this.$store.dispatch('setLoggedIn', res)
                     this.$router.go('/')
                 })
                 .catch(err=>{
                     if(err.response.status===401){
+                        this.errors = err.response.data.errors
                         this.$cookie.delete('token_u')
                         delete axios.defaults.headers.common['Authorization']
                         this.$buefy.toast.open({

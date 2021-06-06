@@ -27,6 +27,12 @@
 		name: 'Home',
 		components: {
 		},
+		props:{
+            isMobile:{
+                type:Boolean,
+                required:true
+            }
+        },
 		data() {
 			return {
 				animated:'slide',

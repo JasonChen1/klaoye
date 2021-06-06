@@ -10,7 +10,7 @@ use Laravel\Passport\HasApiTokens;
 use App\Notifications\UserMailResetPassword;
 use App\Notifications\VerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable //implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -58,4 +58,9 @@ class User extends Authenticatable
     {
         $this->notify((new VerifyEmail())->onQueue('auth-queue'));
     }
+
+    public function cart(){
+        return $this->hasOne('App\Models\Cart');
+    }
+
 }

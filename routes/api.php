@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('categories','ShopController@categories');
+Route::get('search','ShopController@search');
+Route::get('products/{id}','ShopController@details');
+Route::get('products','ShopController@products');
 
 
 // 用户
@@ -30,9 +33,11 @@ Route::prefix('user')->group(function(){
 	Route::get('email/resend', 'Auth\User\VerificationController@resend')->name('verification.resend');
 
 	Route::middleware(['auth:api'])->group(function(){
-		Route::resource('address','UserAddressController');
-		Route::get('order/status/{status}','UserOrderController@orderStatus');
-		Route::resource('order','UserOrderController',['as' => 'user']);
+		Route::post('cart','UserController@addtoCart');
+		Route::get('cart','UserController@cart');
+		// Route::resource('address','UserAddressController');
+		// Route::get('order/status/{status}','UserOrderController@orderStatus');
+		// Route::resource('order','UserOrderController',['as' => 'user']);
 		Route::get('logout', 'Auth\User\AuthController@logout');
 	});
 });
