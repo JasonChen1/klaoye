@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('code',20)->unique();
             $table->string('name',100);
             $table->decimal('price',8,2);
-            $table->decimal('discount',8,2);
+            $table->decimal('discount',8,2)->nullable()->default(0);
             $table->integer('status')->default(1)->comment('0:not active,1:active');
             $table->mediumText('description')->nullable();
             $table->string('size',50)->nullable();

@@ -18,12 +18,12 @@ export default new Router({
 		{ path: '/verified', name:'VERIFIED SUCCESS', component: require('@user/verified.vue').default },
 		{ path: '/password/reset', name:'FORGOT PASSWORD', component: require('@user/email.vue').default },
 		{ path: '/password/reset/:token', name:'PASSWORD RESET', component: require('@user/reset.vue').default },
+		{ path: '/checkout', name:'CHECKOUT', component: require('@user/checkout.vue').default , meta: { requiresAuth: true }},
+		{ path: '/guest/checkout', name:'GUEST CHECKOUT', component: require('@shop/checkout.vue').default },
 
 		// { path: '/order', name:'b_order', component: require('@user/order.vue').default , meta: { requiresAuth: true }},
 		// { path: '/address', name:'b_address', component: require('@user/address.vue').default , meta: { requiresAuth: true }},
 		// { path: '/reset/password', name:'b_update_password', component: require('@user/resetPassword.vue').default , meta: { requiresAuth: true }},
-		// { path: '/checkout', name:'b_checkout', component: require('@user/checkout.vue').default , meta: { requiresAuth: true }},
-		// { path: '/guest/checkout', name:'b_guest_checkout', component: require('@shop/guestCheckout.vue').default },
 		// { path: '/checkout/success', name:'b_checkout_success', component: require('@shop/checkoutSuccess.vue').default },
 
 		{ path: '/:category', name:'CATEGORY', component: require('@shop/products.vue').default },

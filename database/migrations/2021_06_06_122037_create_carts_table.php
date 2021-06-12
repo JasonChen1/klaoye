@@ -16,15 +16,9 @@ class CreateCartsTable extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->integer('num')->default(0);
-            $table->decimal('price',8,2);
-            $table->decimal('subtotal',8,2);
-            $table->decimal('total',8,2);
-            $table->decimal('discount',8,2);
-            $table->decimal('discount_total',8,2);
-            $table->string('detail_id')->nullable();
-            $table->string('color_code')->nullable();
-            $table->bigInteger('product_id')->unsignedBigInteger()->nullable();
+            $table->decimal('subtotal',8,2)->nulllable()->default(0);
+            $table->decimal('total',8,2)->nulllable()->default(0);
+            $table->decimal('discount_total',8,2)->nullable()->default(0);
             $table->timestamps();
         });
     }

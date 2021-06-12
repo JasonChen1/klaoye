@@ -15,7 +15,7 @@
                     </div>
                     <div class="product-price">
                         <strong>$
-                            <span v-if="discount" class="pw-ds">{{discount}} <s>{{product.price}}</s></span>
+                            <span v-if="product.discount" class="pw-ds">{{discount}} <s>{{product.price}}</s></span>
                             <span v-else>{{product.price}}</span>
                         </strong>
                     </div>
@@ -144,6 +144,7 @@
                         this.$emit('reloadHeader')
                     })
                     .catch(err => {
+                        console.log(err)
                         this.toastMessage = 'Add to cart failed'
                         this.toastType = 'is-danger'
                     })

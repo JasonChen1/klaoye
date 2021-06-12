@@ -33,8 +33,14 @@ Route::prefix('user')->group(function(){
 	Route::get('email/resend', 'Auth\User\VerificationController@resend')->name('verification.resend');
 
 	Route::middleware(['auth:api'])->group(function(){
+		// user cart
 		Route::post('cart','UserController@addtoCart');
+		Route::get('cart/count','UserController@cartCount');
+		Route::get('cart/empty','UserController@emptyCart');
 		Route::get('cart','UserController@cart');
+		Route::delete('cart/{id}','UserController@deleteFromCart');
+		Route::patch('cart/{id}','UserController@updateQuantity');
+
 		// Route::resource('address','UserAddressController');
 		// Route::get('order/status/{status}','UserOrderController@orderStatus');
 		// Route::resource('order','UserOrderController',['as' => 'user']);

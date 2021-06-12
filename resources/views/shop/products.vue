@@ -60,7 +60,11 @@
                         <b-input v-model="searchTerm" placeholder="search" expanded />
                     </b-dropdown-item>
 
-                    <b-dropdown-item v-for="item of filteredData" :key="item.name" aria-role="listitem">{{item.name}} ({{item.count}})</b-dropdown-item>
+                    <b-dropdown-item v-for="item of filteredData" :key="item.name" aria-role="listitem">
+                        <router-link class="" :to="`/${item.name}`"> 
+                        {{item.name}} ({{item.count}})
+                        </router-link>
+                    </b-dropdown-item>
                 </b-dropdown>
             </div>
             <div :class="isMobile?'':'col-md-9 pl-0'">

@@ -202,7 +202,9 @@
             this.isLogin = this.$store.getters.isLoggedIn
             if(this.isLogin){
                 this.$store.dispatch('userCart')
-                this.cart = this.$store.getters.userCarts
+                .then(res=>{
+                    this.cart = this.$store.getters.userCarts
+                })
             }else{
                 this.cart = this.$store.getters.carts.length
             }
@@ -231,7 +233,10 @@
             },
             reload(){
                 if(this.isLogin){
-                    this.cart = this.$store.getters.userCarts
+                    this.$store.dispatch('userCart')
+                    .then(res=>{
+                        this.cart = this.$store.getters.userCarts
+                    })
                 }else{
                     this.cart = this.$store.getters.carts.length
                 }

@@ -17,15 +17,15 @@ class Cart extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id','num','discount','subtotal','total','discount_total','price','detail_id','color_code','product_id',
+        'user_id','total','subtotal','discount_total',
     ];
 
     public function user(){
         return $this->belongsToOne('App\Models\User');
     }
 
-    public function products(){
-        return $this->hasMany('App\Models\Product','id','product_id');
+    public function items(){
+        return $this->hasMany('App\Models\CartItem');
     }
 
 }

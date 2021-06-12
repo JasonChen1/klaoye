@@ -225,7 +225,7 @@
                             </div>
                             <div class="col">
                                 <b-field label="Discount">
-                                    <b-input type="text" class="" v-model="form.discount"  @keyup="errors.discount=''" placeholder="Discount" required></b-input>
+                                    <b-input type="text" class="" v-model="form.discount"  @keyup="errors.discount=''" placeholder="Discount" ></b-input>
                                 </b-field>
                                 <span class="err d-flex" v-if="errors.discount" >
                                     {{errors.discount[0]}}

@@ -18,7 +18,6 @@ export default {
 		[ADD_CART] (state, data) {
 			let discount = 0
 			let discountTotal = 0
-			let percent= 0
 			let subTotal = 0
 			let exists = false
 			for (var i = 0; i < state.carts.length; i++) {
@@ -30,29 +29,26 @@ export default {
 						state.carts[i]['num'] +=1
 						subTotal = state.carts[i]['num']*state.carts[i].price
 						if(state.carts[i].discount){
-							discount = state.carts[i].discount*state.carts[i]['num']
-							discountTotal = subTotal - discount	
+							state.carts[i]['discounted'] = (state.carts[i].price - state.carts[i].discount).toFixed(2)
 						}
 						if(data.color_code){
 							state.carts[i]['color_code'] = data.color_code
 							state.carts[i]['color_id'] = data.color_id
 						}
+						// each products subtotal and discounted total
+						state.carts[i]['discount_total'] = (state.carts[i].discount*state.carts[i]['num']).toFixed(2)
 						state.carts[i]['subtotal'] = subTotal.toFixed(2)
-						state.carts[i]['discount_total'] = discountTotal.toFixed(2)
 					}
 				}
 			}
-			
 			if(!exists){
 				data.occupied += 1
 				data['num'] = 1
 				data['subtotal'] = data.price
+				data['discount_total'] = 0
 				if(data.discount){
-					discount = data.discount*data.num
-					discountTotal = data.price - discount
-
-					data['discount_total'] = discountTotal.toFixed(2)
-					data['discounted'] = (data.price - discount).toFixed(2)
+					data['discount_total'] = data.discount
+					data['discounted'] = (data.price - data.discount).toFixed(2)
 				}
 						
 				state.carts.push(data)
@@ -83,15 +79,9 @@ export default {
 			state.carts[data.index]['num'] = data.data.quantity
 			subTotal = state.carts[data.index]['num']*state.carts[data.index]['price']
 			if(state.carts[data.index]['discount']){
-				if (state.carts[data.index]['discount'].includes('%')) {
-					percent = state.carts[data.index]['discount'].split('%')[0]/100;
-					discount = subTotal*percent
-					discountTotal = subTotal-discount
-				}else{
-					discount = state.carts[data.index]['discount']*state.carts[data.index]['num']
-					discountTotal = subTotal - discount
-				}
+				discountTotal = state.carts[data.index]['discount']*state.carts[data.index]['num']
 				state.carts[data.index]['discount_total'] = discountTotal.toFixed(2)
+
 				if(!state.carts[data.index]['discounted']){
 					state.carts[data.index]['discounted'] = (state.carts[data.index]['price']-discount).toFixed(2)
 				}
@@ -147,7 +137,7 @@ export default {
 		},
 		userCart({commit,getters}){
 			return new Promise((resolve,reject)=>{
-				axios.get(`/api/user/cart`)
+				axios.get(`/api/user/cart/count`)
 				.then(res=>{
 					commit(USER_CART,res.data)
 					resolve('success')
