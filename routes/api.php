@@ -18,7 +18,7 @@ Route::get('categories','ShopController@categories');
 Route::get('search','ShopController@search');
 Route::get('products/{id}','ShopController@details');
 Route::get('products','ShopController@products');
-
+Route::get('testimonials','ShopController@testimonials');
 
 // 用户
 Route::prefix('user')->group(function(){
@@ -60,6 +60,9 @@ Route::prefix('admin')->group(function(){
 	Route::middleware(['auth:adminApi'])->group(function(){
 		// 刷新token
 		Route::get('refresh/token','Auth\Admin\AuthController@refreshToken');
+		// Testimonials
+		Route::resource('testimonials','TestimonialController');		
+		Route::post('testimonials/{id}','TestimonialController@update');		
 		// 商品
 		Route::resource('products','ProductController');
 		Route::post('products/{id}','ProductController@update');

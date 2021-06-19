@@ -44,7 +44,9 @@
 
                 :row-class="(row, index) => row.status === 0 && 'is-inactive'"
                 >
-
+                <b-table-column field="id" label="ID" sortable searchable v-slot="props">
+                    {{ props.row.id }}
+                </b-table-column>
                 <b-table-column field="code" label="Code" sortable searchable v-slot="props">
                     {{ props.row.code }}
                 </b-table-column>
@@ -58,8 +60,10 @@
                         </div>
                     </div>
                 </b-table-column>
-                <b-table-column field="price" label="Price" width="120" sortable searchable v-slot="props">
-                    <p><strong>Price:</strong>${{ props.row.price }}</p>
+                <b-table-column field="price" label="Price" width="150" sortable searchable v-slot="props">
+                    <p><strong>Price:</strong> ${{ props.row.price }}</p>
+                    <p><strong>Discount:</strong> ${{ props.row.discount }}</p>
+                    <p><strong>Delivery Cost:</strong> ${{ props.row.delivery }}</p>
                 </b-table-column>
                 <b-table-column field="stock" label="Stock" width="120" sortable searchable v-slot="props">
                     {{ props.row.stock }}
@@ -198,7 +202,13 @@
                                 </b-field>
                             </div>
                             <div class="col" >
-                                <b-field label="Select a Sub-Category">
+                                <b-field label="Delivery Cost">
+                                    <b-input type="text" class="" v-model="form.delivery"  @keyup="errors.delivery=''" placeholder="0.00" ></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.delivery" >
+                                    {{errors.delivery[0]}}
+                                </span>
+                                <!-- <b-field label="Select a Sub-Category">
                                     <b-autocomplete
                                     v-if="selectedCategory"
                                         v-model="subCategoryName"
@@ -211,7 +221,7 @@
                                         :clearable="false"
                                     >
                                     </b-autocomplete>
-                                </b-field>
+                                </b-field> -->
                             </div>
                         </div>
                         <div class="form-row">
@@ -234,8 +244,8 @@
                         </div>
                         <div class="form-row">
                             <div class="col">
-                                <b-field label="size">
-                                    <b-input type="text" class="" v-model="form.size"  @keyup="errors.size=''" placeholder="size"></b-input>
+                                <b-field label="Size">
+                                    <b-input type="text" class="" v-model="form.size"  @keyup="errors.size=''" placeholder="Size"></b-input>
                                 </b-field>
                                 <span class="err d-flex" v-if="errors.size" >
                                     {{errors.size[0]}}
@@ -397,6 +407,7 @@
                     name:'',
                     price:'',
                     discount:'',
+                    delivery:'',
                     stock:'',
                     description:'',
                     size:'',
@@ -415,15 +426,6 @@
                 selectedSubCategory:false,
                 categoryName:'',
                 subCategoryName:'',
-                // import
-                file:null,
-                productDescription:null,
-                // sync btn 
-                syncBtn:false,
-                btnLoading:false,
-                progressVal:0,
-                // bulk edit
-                radio:null,
                 // categories
                 categories:[],
             }
@@ -457,20 +459,20 @@
                         )
                 })
             },
-            filterSubCategories(){
-                if(this.selectedCategory){
-                    return this.selectedCategory.subcategories.filter(option => {
-                        return (
-                            option.name
-                            .toString()
-                            .toLowerCase()
-                            .indexOf(this.subCategoryName.toLowerCase()) >= 0
-                            )
-                    })
-                }else{
-                    return ''
-                }
-            }
+            // filterSubCategories(){
+            //     if(this.selectedCategory){
+            //         return this.selectedCategory.subcategories.filter(option => {
+            //             return (
+            //                 option.name
+            //                 .toString()
+            //                 .toLowerCase()
+            //                 .indexOf(this.subCategoryName.toLowerCase()) >= 0
+            //                 )
+            //         })
+            //     }else{
+            //         return ''
+            //     }
+            // }
         },
         methods:{
             loadCategories(){
@@ -512,23 +514,6 @@
                         })
                     })
                 }
-            },
-            exportStock(){
-                axios({
-                    url: '/api/admin/export/stocks',
-                    method: 'GET',
-                    responseType: 'blob'
-                }).then((res) => {
-                    var fileURL = window.URL.createObjectURL(new Blob([res.data]));
-                    var fileLink = document.createElement('a');
-                    fileLink.href = fileURL;
-                    fileLink.setAttribute('download', 'products.xlsx');
-                    document.body.appendChild(fileLink);
-                    fileLink.click();
-                })
-                .catch(err=>{
-                    console.log(err)
-                })
             },
             deleteColor(details,id,i){
                 axios.delete(`/api/admin/product/colour/${id}`)
@@ -723,80 +708,6 @@
                         hasIcon: true
                     })
                     this.isModalLoading = false
-                })
-            },
-            importProducts(){
-                var formData = new FormData()
-                var file = this.file
-                formData.append("file", file);
-                this.isLoading = true
-                axios.post(`/api/import/products`,formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                })
-                .then(res=>{
-                    if(res.data.current_page<res.data.last_page){
-                        this.continueImportProducts(2,res.data.fileData)
-                        this.progressVal = (100/res.data.last_page)*1
-                    }else{
-                        this.file = null
-                        this.loadData()
-                        this.$buefy.notification.open({
-                            duration: 3000,
-                            message: this.$t('admin.import_product_success'),
-                            position: 'is-top-right',
-                            type: 'is-success',
-                            hasIcon: true
-                        })
-                        this.isLoading = false
-                    }
-                })
-                .catch(err=>{
-                    this.$buefy.notification.open({
-                        duration: 3000,
-                        message: this.$t('admin.import_product_failed'),
-                        position: 'is-top-right',
-                        type: 'is-danger',
-                        hasIcon: true
-                    })
-                    this.errors = err.response.data
-                    this.isLoading = false
-                })
-            },
-            continueImportProducts(next,data){
-                axios.post(`/api/import/products?page=${next}`,{
-                    fileData:data
-                })
-                .then(res=>{
-                    let n =parseInt(res.data.current_page)+1
-                    if(n <=res.data.last_page){
-                        this.progressVal = (100/res.data.last_page)*n
-                        this.continueImportProducts(n,res.data.fileData)
-                    }else{
-                        this.file = null
-                        this.loadData()
-                        this.$buefy.notification.open({
-                            duration: 3000,
-                            message: this.$t('admin.import_product_success'),
-                            position: 'is-top-right',
-                            type: 'is-success',
-                            hasIcon: true
-                        })
-                        this.isLoading = false
-                        this.progressVal = 0
-                    }
-                })
-                .catch(err=>{
-                    this.$buefy.notification.open({
-                        duration: 3000,
-                        message: this.$t('admin.import_product_failed'),
-                        position: 'is-top-right',
-                        type: 'is-danger',
-                        hasIcon: true
-                    })
-                    this.errors = err.response.data
-                    this.isLoading = false
                 })
             },
             closePoptip(){

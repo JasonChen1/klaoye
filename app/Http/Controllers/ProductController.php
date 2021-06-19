@@ -131,7 +131,7 @@ class ProductController extends Controller
         }    
 
         $prod = Product::findOrFail($id);
-        $prod->update($request->all());
+        $prod->update($request->except(['sub_category_id','sub_category_name']));
 
         if($request->images){
             foreach ($request->images as $image) {

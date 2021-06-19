@@ -26,7 +26,7 @@ class Category extends FormRequest
     {
         return [
             'category'=>'required|string',
-            'subcategory'=>'nullable|string|unique:sub_categories,name',
+            // 'subcategory'=>'nullable|string|unique:sub_categories,name',
         ];
     }
 

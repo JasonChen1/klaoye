@@ -28,7 +28,14 @@
                         <i class="ivu-icon ivu-icon-ios-book"></i>
                         <span>Products</span>
                     </li> 
-                   
+                    
+                    <li class="ivu-menu-item" 
+                        @click="activeTab='testimonial'" 
+                        :class="activeTab==='testimonial'?'anav-active':''">
+                        <i class="ivu-icon ivu-icon-ios-book"></i>
+                        <span>Testimonials</span>
+                    </li> 
+
                     <li class="ivu-menu-item" 
                         @click="activeTab='order'" 
                         :class="activeTab==='order'?'anav-active':''">
@@ -94,6 +101,9 @@
                     <div v-if="activeTab==='product'">
                         <v-product-table></v-product-table>
                     </div>
+                    <div v-if="activeTab==='testimonial'">
+                        <v-testimonial-table></v-testimonial-table>
+                    </div>
                     <div v-if="activeTab==='order'">
                         <v-order></v-order>
                     </div>
@@ -118,6 +128,7 @@
     import Enquiries from './enquiries'
     import Coupon from './coupon'
     import CategoryTable from './category'
+    import TestimonialTable from './testimonial'
 
     export default {
         name: 'Dashboard',
@@ -136,6 +147,7 @@
             'v-order':Order,
             'v-enquiries':Enquiries,            
             'v-coupon':Coupon,
+            'v-testimonial-table':TestimonialTable,
         },
         data() {
             return {
@@ -148,9 +160,10 @@
                     'dashboard':'Dashboard',
                     'category':'Categories',
                     'product':'Products',
+                    'testimonial':'Testimonials',
                     'order':'Orders',
                     'enquiry':'Enquiries',
-                    'coupon':'header.coupon',
+                    'coupon':'Coupon',
                 },
                 reload:0,
                 currencyList:[],

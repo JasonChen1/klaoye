@@ -78,8 +78,6 @@
                     </b-sidebar>
                 </div>
             </template>
-            <!-- <template slot="start" >
-            </template> -->
             <template slot="end">
                 <b-navbar-item tag="div">
                     <b-field label="">

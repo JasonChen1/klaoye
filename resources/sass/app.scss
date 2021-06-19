@@ -1,5 +1,5 @@
 // Fonts
-/*@import url('https://fonts.googleapis.co?m/css?family=Nunito');*/
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600&display=swap');
 
 // Variables
 @import 'variables';
@@ -37,6 +37,16 @@ $link-focus-border: $primary;
 @import "~buefy/src/scss/buefy";
 @import '~@mdi/font/scss/materialdesignicons';
 
+html, body {
+  font-family: 'EB Garamond', serif !important;
+}
+
+h2{
+    font-size: 16pt;
+}
+h3{
+    font-size: 14pt;
+}
 h1,h2,h3,h4,h5,h6{
     font-weight: bold;
 }
@@ -135,6 +145,63 @@ tr.is-inactive {
 td{
     vertical-align: middle !important;
 }
+/*index*/
+.section-title{
+    padding: 2rem 0 ;
+}
+.b-image-wrapper{
+    max-height: 70vh;
+}
+.cate-wp{
+    a{
+        color: #515A61;
+        &:hover{
+            color: #73b3ad;
+        }
+    }
+}
+.hc-lwp,.hc-rwp{
+    display: flex;
+    flex-wrap: wrap;
+    .img-wp{
+        width: 25%;
+        height: auto;
+    }
+}
+.hc-rwp{
+    justify-content: flex-end;
+}
+.testi-wp{
+    display: flex;
+    flex-wrap: wrap;
+    .mw-33{
+        max-width: 33%;
+    }
+    .t-wp{
+        padding-right: 1rem;
+        margin-right: 1rem;
+        .pd-wp{
+            color: #515A61;
+            background: whitesmoke;
+            box-shadow: 1px 2px 5px #dcdcdc;
+        }
+        .rating{
+            padding: 1rem 0;
+        }
+        .description{
+            word-break: break-word;
+        }
+        .person-wp{
+            img{
+                border-radius: 50%;
+            }
+            .p-circle{
+                border-radius: 50%;
+                border: 1px solid #515A61;
+            }
+        }
+    }
+}
 /*header*/
 .custom-cart{
     display: flex;
@@ -144,7 +211,7 @@ td{
 .dot{
     position: absolute;
     color: white;
-    top: 30px;
+    top: 22px;
     left: 28px;
     background: red;
     border-radius: 50%;
@@ -154,12 +221,15 @@ td{
     text-align: center;
 }
 .header-df{
-    padding-top: 4.35rem;
+    padding-top: 3.3rem;
     .navbar-item img{
         max-height: 80px;
     }
     .navbar-brand{
         margin-left: 3rem;
+        a{
+            padding: 0;
+        }
     }
 }
 .header-mb{
@@ -330,20 +400,29 @@ ul{
     min-height: 30vh;
 }
 /*carousel*/
-.is-active .al img {
-    filter: grayscale(0%);
+
+/*.carousel-wp-mb{
+    margin: 4.5rem 0 2rem 0;
 }
-.al img {
-    filter: grayscale(100%);
+.carousel-wp{
+    margin: 4.5rem 10% 2rem 10%;   
+}*/
+
+.carousel-wp{
+    margin-top: 4.5rem;   
 }
 .carousel-item{
     display: block;
-    img{
-        height: 50%;
-    }
 }
-.carousel-wp{
-    margin-top: 4.5rem;
+.carousel-indicator{
+    .indicator-item{
+        padding: .3rem;
+        border-radius: 50%;
+        border: 1px solid #fff;
+        &.is-active{
+            background: #fff;
+        }
+    }
 }
 /*magnifier*/
 .image-magnifier img{
@@ -737,4 +816,27 @@ ul{
 }
 .btn-custom-cl{
     background: #6f6f6f !important;
+}
+
+/*checkout*/
+.guest-checkout-wp{
+    border: 1px solid #dfdfdf;
+    margin: 1rem;
+    .guest-address-wp{
+        border-right: 1px solid #dfdfdf;
+    }
+    .guest-address-wp,
+    .guest-checkout-method-wp{
+        padding: 2rem;
+        h2{
+            font-size: 14pt;
+        }
+    }
+    .guest-address-wp-mb,
+    .guest-checkout-method-wp-mb{
+        padding: 1rem;
+    }
+}
+.hr{
+    border: 1px solid #515A61;
 }

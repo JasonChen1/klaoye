@@ -33,8 +33,11 @@
                 :mobile-cards="hasMobileCards">
 
                 <b-table-column v-slot="props" field="image" label="Image" width="100" centered > 
-                    <div v-if="props.row.images || props.row.image_url" v-lazy-container="{ selector: 'img' }" @click="imageActive(props.row.images[0].image_url)" class="cart-product-img">
+                    <div v-if="props.row.images.length>0" v-lazy-container="{ selector: 'img' }" @click="imageActive(props.row.images[0].image_url)" class="cart-product-img">
                         <img :data-src="`/storage/thumbnail/${props.row.images[0].image_url}`">
+                    </div>
+                    <div v-else v-lazy-container="{ selector: 'img' }" class="cart-product-img">
+                        <img :data-src="`/public/errorImage.jpg`">
                     </div>
                 </b-table-column>
                 <b-table-column v-slot="props" field="name" label="Details" sortable :class="isMobile?'cart-mb-name':''">
@@ -48,7 +51,7 @@
                     </div>
                 </b-table-column>
                 <b-table-column v-slot="props" field="price" label="Unit Price" sortable centered>
-                    <span v-if="props.row.discount"> 
+                    <span v-if="props.row.discount>0"> 
                         $ {{props.row.discounted}}<br>
                         <s>$ {{ props.row.price }}</s>
                     </span>
@@ -76,7 +79,7 @@
                     </div>
                 </b-table-column>
                 <b-table-column v-slot="props" field="subtotal" label="Subtotal" sortable centered>
-                    <span v-if="props.row.discount"> 
+                    <span v-if="props.row.discount>0"> 
                         $ {{props.row.subtotal-props.row.discount_total}}<br>
                         <s>$ {{ props.row.subtotal }}</s>
                     </span>
@@ -111,6 +114,12 @@
                                     <strong>Discount:</strong>
                                     <div class="price-tag-wp">
                                         <strong>$ {{ discount_total.toFixed(2) }}</strong>
+                                    </div>
+                                </div>
+                                <div class="cost-wp">
+                                    <strong>Delivery Cost:</strong>
+                                    <div class="price-tag-wp">
+                                        <strong>$ {{ delivery_total.toFixed(2) }}</strong>
                                     </div>
                                 </div>
                                 <div class="cost-wp">
@@ -172,6 +181,7 @@
                 discount:0,
                 subtotal:0,
                 discount_total:0,
+                delivery_total:0,
             }
         },
         mounted(){
@@ -197,6 +207,7 @@
                 this.$store.dispatch('addCartTotal', { 
                     subtotal:this.subtotal.toFixed(2),
                     total:this.total.toFixed(2),
+                    delivery_total: this.delivery_total.toFixed(2),
                     discount_total: this.discount_total.toFixed(2),
                 })
                 this.$router.push(url)
@@ -209,6 +220,7 @@
                     this.total = parseFloat(res.data.total.total)
                     this.subtotal = parseFloat(res.data.total.subtotal)
                     this.discount_total = parseFloat(res.data.total.discount_total)
+                    this.delivery_total = parseFloat(res.data.total.delivery_total)
                 })
                 .catch(err=>{})
                 .finally(res=>{
@@ -217,16 +229,22 @@
             },
             // 统计原价总金额
             calTotal(){
-                this.total = this.subtotal = this.discount_total = 0
+                this.total = this.subtotal = this.discount_total = this.delivery_total = 0
                 for (var i = 0; i < this.data.length; i++) {
                     if(this.data[i].discount_total>0){
                         this.total+=parseFloat(this.data[i].subtotal - this.data[i].discount_total)
+
                         this.discount_total += parseFloat(this.data[i].discount_total)
                     }else{
                         this.total+=parseFloat(this.data[i].subtotal)
                     }
+                    if(this.data[i].delivery_total>0){
+                        this.delivery_total += parseFloat(this.data[i].delivery_total)
+                    }
                     this.subtotal += parseFloat(this.data[i].subtotal)
                 }
+
+                this.total = this.total + this.delivery_total
             },
             imageActive(url){
                 this.imageModalActive=true

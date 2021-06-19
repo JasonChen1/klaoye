@@ -17,7 +17,7 @@ class CartItem extends Model
      * @var array
      */
     protected $fillable = [
-        'num','discount','subtotal','total','discount_total','price','detail_id','color_code','product_id','cart_id','discounted',
+        'num','discount','subtotal','total','discount_total','price','detail_id','color_code','product_id','cart_id','discounted','delivery',
     ];
 
     public function cart(){

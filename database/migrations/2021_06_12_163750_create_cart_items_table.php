@@ -21,6 +21,7 @@ class CreateCartItemsTable extends Migration
             $table->decimal('subtotal',8,2);
             $table->decimal('total',8,2);
             $table->decimal('discount',8,2)->nullable()->default(0);
+            $table->decimal('delivery',8,2)->nullable()->default(0);
             $table->decimal('discounted',8,2)->nullable()->default(0);
             $table->decimal('discount_total',8,2)->nullable()->default(0);
             $table->string('detail_id')->nullable();

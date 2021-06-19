@@ -1,5 +1,5 @@
+@import url(https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600&display=swap);
 @charset "UTF-8";
-/*@import url('https://fonts.googleapis.co?m/css?family=Nunito');*/
 /*!
  * Bootstrap v4.6.0 (https://getbootstrap.com/)
  * Copyright 2011-2021 The Bootstrap Authors
@@ -49136,6 +49136,18 @@ MIT (https://github.com/Wikiki/bulma-steps/blob/master/LICENSE)
     transform: rotate(359deg);
   }
 }
+html, body {
+  font-family: "EB Garamond", serif !important;
+}
+
+h2 {
+  font-size: 16pt;
+}
+
+h3 {
+  font-size: 14pt;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
 }
@@ -49243,6 +49255,65 @@ td {
   vertical-align: middle !important;
 }
 
+/*index*/
+.section-title {
+  padding: 2rem 0;
+}
+
+.b-image-wrapper {
+  max-height: 70vh;
+}
+
+.cate-wp a {
+  color: #515A61;
+}
+.cate-wp a:hover {
+  color: #73b3ad;
+}
+
+.hc-lwp, .hc-rwp {
+  display: flex;
+  flex-wrap: wrap;
+}
+.hc-lwp .img-wp, .hc-rwp .img-wp {
+  width: 25%;
+  height: auto;
+}
+
+.hc-rwp {
+  justify-content: flex-end;
+}
+
+.testi-wp {
+  display: flex;
+  flex-wrap: wrap;
+}
+.testi-wp .mw-33 {
+  max-width: 33%;
+}
+.testi-wp .t-wp {
+  padding-right: 1rem;
+  margin-right: 1rem;
+}
+.testi-wp .t-wp .pd-wp {
+  color: #515A61;
+  background: whitesmoke;
+  box-shadow: 1px 2px 5px #dcdcdc;
+}
+.testi-wp .t-wp .rating {
+  padding: 1rem 0;
+}
+.testi-wp .t-wp .description {
+  word-break: break-word;
+}
+.testi-wp .t-wp .person-wp img {
+  border-radius: 50%;
+}
+.testi-wp .t-wp .person-wp .p-circle {
+  border-radius: 50%;
+  border: 1px solid #515A61;
+}
+
 /*header*/
 .custom-cart {
   display: flex;
@@ -49253,7 +49324,7 @@ td {
 .dot {
   position: absolute;
   color: white;
-  top: 30px;
+  top: 22px;
   left: 28px;
   background: red;
   border-radius: 50%;
@@ -49264,13 +49335,16 @@ td {
 }
 
 .header-df {
-  padding-top: 4.35rem;
+  padding-top: 3.3rem;
 }
 .header-df .navbar-item img {
   max-height: 80px;
 }
 .header-df .navbar-brand {
   margin-left: 3rem;
+}
+.header-df .navbar-brand a {
+  padding: 0;
 }
 
 .header-mb .navbar-item img {
@@ -49456,23 +49530,27 @@ ul {
 }
 
 /*carousel*/
-.is-active .al img {
-  filter: grayscale(0%);
+/*.carousel-wp-mb{
+    margin: 4.5rem 0 2rem 0;
 }
-
-.al img {
-  filter: grayscale(100%);
+.carousel-wp{
+    margin: 4.5rem 10% 2rem 10%;   
+}*/
+.carousel-wp {
+  margin-top: 4.5rem;
 }
 
 .carousel-item {
   display: block;
 }
-.carousel-item img {
-  height: 50%;
-}
 
-.carousel-wp {
-  margin-top: 4.5rem;
+.carousel-indicator .indicator-item {
+  padding: 0.3rem;
+  border-radius: 50%;
+  border: 1px solid #fff;
+}
+.carousel-indicator .indicator-item.is-active {
+  background: #fff;
 }
 
 /*magnifier*/
@@ -49909,4 +49987,29 @@ ul {
 
 .btn-custom-cl {
   background: #6f6f6f !important;
+}
+
+/*checkout*/
+.guest-checkout-wp {
+  border: 1px solid #dfdfdf;
+  margin: 1rem;
+}
+.guest-checkout-wp .guest-address-wp {
+  border-right: 1px solid #dfdfdf;
+}
+.guest-checkout-wp .guest-address-wp,
+.guest-checkout-wp .guest-checkout-method-wp {
+  padding: 2rem;
+}
+.guest-checkout-wp .guest-address-wp h2,
+.guest-checkout-wp .guest-checkout-method-wp h2 {
+  font-size: 14pt;
+}
+.guest-checkout-wp .guest-address-wp-mb,
+.guest-checkout-wp .guest-checkout-method-wp-mb {
+  padding: 1rem;
+}
+
+.hr {
+  border: 1px solid #515A61;
 }

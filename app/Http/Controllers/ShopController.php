@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use App\Models\{User,Category,SubCategory,Product,ProductImage,ProductDetail};
+use App\Models\{User,Category,SubCategory,Product,ProductImage,ProductDetail,Testimonial};
 use Illuminate\Support\Facades\Validator;
 use Cache;
 use DB;
@@ -34,6 +34,11 @@ class ShopController extends Controller
 		$v8->executeString($app_source);
 
 		return ob_get_clean();
+	}
+
+	/*get all testimonials*/
+	public function testimonials(){
+		return Testimonial::with(['product','image'])->get();
 	}
 
 	/*get all categories*/

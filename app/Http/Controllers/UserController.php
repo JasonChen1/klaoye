@@ -53,6 +53,7 @@ class UserController extends Controller
 			$user->cart()->update([
 				'total'=>0,
 				'subtotal'=>0,
+				'delivery_total'=>0,
 				'discount_total'=>0
 			]);
 		}, 3);
@@ -101,7 +102,8 @@ class UserController extends Controller
 		$cart = [
 			'total'=>$user->cart->total-$item->total,
 			'subtotal'=>$user->cart->subtotal-$item->subtotal,
-			'discount_total'=>$user->cart->discount_total-$item->discount_total
+			'discount_total'=>$user->cart->discount_total-$item->discount_total,
+			'delivery_total'=>$user->cart->delivery_total-$item->delivery_total,
 		];
 		DB::transaction(function () use($user,$item,$cart,$prod) {
 			$user->cart()->update($cart);
@@ -128,21 +130,19 @@ class UserController extends Controller
 			}
 			
 			$num = 1;
-			$total = $discount_total = $subtotal =$discount= 0;
+			$total = $discount_total = $subtotal =$discount=$delivery_total= 0;
 			
 			// if different color save as new record
-			if(!$exists){
-				$subtotal = $prod->price * $num;
-				$discount_total = $prod->discount * $num;
-			}else{
+			if($exists){
 				$num = $exists->num+1;
-				$subtotal = $prod->price * $num;
-				$discount_total = $prod->discount * $num;	
 			}
+			$subtotal = $prod->price * $num;
+			$discount_total = $prod->discount * $num;	
+			$delivery_total = $prod->delivery * $num;
 
-			$total = $subtotal - $discount_total;
+			$total = $subtotal - $discount_total + $delivery_total;
 
-			DB::transaction(function () use($prod,$num,$total,$subtotal,$discount_total,$request,$cart) {
+			DB::transaction(function () use($prod,$num,$total,$subtotal,$discount_total,$request,$cart,$delivery_total) {
 				$cart->items()->updateOrCreate(
 					[
 						'product_id'=>$prod->id,
@@ -152,6 +152,7 @@ class UserController extends Controller
 						'num'=>$num,
 						'price'=>$prod->price,
 						'discount'=>$prod->discount,
+						'delivery'=>$prod->delivery,
 						'color_code'=>$request->color_code,
 						'subtotal'=>$subtotal,
 						'total'=>$total,
@@ -160,6 +161,7 @@ class UserController extends Controller
 					]);
 
 				$cart->update([
+					'delivery_total'=>$cart->delivery_total+$delivery_total,
 					'discount_total'=>$cart->discount_total+$discount_total,
 					'subtotal'=>$cart->subtotal+$subtotal,
 					'total'=>$cart->total+$total
@@ -192,23 +194,27 @@ class UserController extends Controller
 		$numDiff = $request->num - $item->num;
 		$subtotal = $prod->price*$numDiff;
 		$discount_total = $prod->discount*$numDiff;
-		$total = $subtotal - $discount_total;
+		$delivery_total = $prod->delivery*$numDiff;
+		$total = $subtotal - $discount_total + $delivery_total;
 
 		// cart total
 		$cart = [
 			'total'=>$user->cart->total+$total,
 			'subtotal'=>$user->cart->subtotal+$subtotal,
-			'discount_total'=>$user->cart->discount_total+$discount_total
+			'discount_total'=>$user->cart->discount_total+$discount_total,
+			'delivery_total'=>$user->cart->delivery_total+$delivery_total,
 		];
 
 		// product total
 		$pSubtotal = $prod->price * $request->num;
 		$pDiscount_total = $prod->discount * $request->num;
+		$pDelivery_total = $prod->delivery * $request->num;
 
 		$newItem = [
 			'num'=>$request->num,
 			'subtotal'=>$pSubtotal,
 			'discount_total'=>$pDiscount_total,
+			'delivery_total'=>$pDelivery_total,
 			'total'=>$pSubtotal-$pDiscount_total,
 			'occupied'=>$prod->occupied+$request->num,
 		];

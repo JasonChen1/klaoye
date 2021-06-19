@@ -19,6 +19,7 @@ class CreateCartsTable extends Migration
             $table->decimal('subtotal',8,2)->nulllable()->default(0);
             $table->decimal('total',8,2)->nulllable()->default(0);
             $table->decimal('discount_total',8,2)->nullable()->default(0);
+            $table->decimal('delivery_total',8,2)->nullable()->default(0);
             $table->timestamps();
         });
     }

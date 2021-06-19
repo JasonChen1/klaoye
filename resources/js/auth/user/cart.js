@@ -37,6 +37,7 @@ export default {
 						}
 						// each products subtotal and discounted total
 						state.carts[i]['discount_total'] = (state.carts[i].discount*state.carts[i]['num']).toFixed(2)
+						state.carts[i]['delivery_total'] = (state.carts[i].delivery*state.carts[i]['num']).toFixed(2)
 						state.carts[i]['subtotal'] = subTotal.toFixed(2)
 					}
 				}
@@ -46,6 +47,7 @@ export default {
 				data['num'] = 1
 				data['subtotal'] = data.price
 				data['discount_total'] = 0
+				data['delivery_total'] = data.delivery
 				if(data.discount){
 					data['discount_total'] = data.discount
 					data['discounted'] = (data.price - data.discount).toFixed(2)
@@ -85,6 +87,10 @@ export default {
 				if(!state.carts[data.index]['discounted']){
 					state.carts[data.index]['discounted'] = (state.carts[data.index]['price']-discount).toFixed(2)
 				}
+			}
+			if(state.carts[data.index]['delivery']){
+				discountTotal = state.carts[data.index]['delivery']*state.carts[data.index]['num']
+				state.carts[data.index]['delivery_total'] = discountTotal.toFixed(2)
 			}
 			if(state.carts[data.index]['color_code']){
 				state.carts[data.index]['color_code'] = state.carts[data.index]['color_code']
