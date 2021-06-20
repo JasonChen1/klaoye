@@ -19,6 +19,8 @@ Route::get('search','ShopController@search');
 Route::get('products/{id}','ShopController@details');
 Route::get('products','ShopController@products');
 Route::get('testimonials','ShopController@testimonials');
+Route::post('checkout','ShopController@checkout');
+Route::post('stripe/callback','ShopController@stripeCallback');
 
 // 用户
 Route::prefix('user')->group(function(){

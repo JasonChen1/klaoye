@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use App\Models\{User,Category,SubCategory,Product,ProductImage,ProductDetail,Testimonial};
 use Illuminate\Support\Facades\Validator;
+use App\Rules\StringSymbol;
+use Stripe\Stripe;
+use Carbon\Carbon;
 use Cache;
 use DB;
 
@@ -136,6 +139,72 @@ class ShopController extends Controller
         $response['categories'] = $categories;
 
 		return response()->json($response,200);
+	}
+
+	/*calculate cart total*/
+	private function calTotal($products){
+		$total = 0;
+
+
+
+	}
+
+	/* Stripe checkout */
+	public function checkout(Request $request){
+		// direct checkout
+		if($request->prod){
+			//todo
+		}
+
+		// pay existing order
+		if($request->order_no){
+			return $this->orderCheckout($request);
+		}
+
+		// shipping address must be exists
+		$v = Validator::make($request->all(), [
+			"email" => "required|email"
+			"phone" => "nullable|integer"
+			"name" => ['required',new StringSymbol()],
+			"address" => ['required',new StringSymbol()],
+			"city" => ['required',new StringSymbol()],
+			"state" => ['nullable',new StringSymbol()],
+			"country" => ['required',new StringSymbol()],
+			"postal_code" => "required|integer"
+        ]);
+
+        if ($v->fails()) {
+            return response()->json($v->errors(),422);
+        } 
+
+
+		if(empty($request->cartData)){
+			return response()->json('No product avaiable for checkout',400);
+		}
+
+
+		// create order
+		$orderNo = Carbon::now()->timestamp.$admin->id;
+
+
+		// add order items
+
+		dd($request->all());
+		$ss = env('STRIPE_TEST_SECRET');
+		Stripe::setApiKey($ss);
+
+
+	}
+
+	/*stripe callback - update product status (occupied,cart)*/
+	public function stripeCallback(Request $request){
+		dd($request->all());
+
+	}
+
+	/*check out order that already exist but have not being paid*/
+	public function orderCheckout(Request $request){
+
 	}
 	
 }

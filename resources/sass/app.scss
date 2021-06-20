@@ -840,3 +840,80 @@ ul{
 .hr{
     border: 1px solid #515A61;
 }
+.price-wp{
+    display: flex;
+    justify-content: flex-end;
+    .price{
+        min-width: 110px;
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+.stripe-form{
+    padding-top: 1rem;
+}
+.prod{
+    display: flex;
+    border-bottom: 1px solid whitesmoke;
+    padding: .5rem;
+    .p-img{
+        min-width: 90px;
+    }
+    .prod-des{
+        display: flex;
+        flex-direction: column;
+    }
+    .sub-wp{
+        display: flex;
+        justify-content: flex-end;
+        width: -webkit-fill-available;
+        .sub-wp-inner{
+            display: flex;
+            flex-direction: column;
+            .unit-line{
+                border-top: 1px solid whitesmoke;
+                color: #dcdcdc;
+            }
+        }
+    }
+}
+.total-wp{
+    padding: 1rem 0 0 0;
+}
+.divider{
+    padding-top: 16px;
+    padding-bottom: 32px;
+    justify-content: center;
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    overflow: hidden;
+    hr{
+        width: 100%;
+        height: 1px;
+        border: none;
+        background-color: rgba(26,26,26,.1);
+        box-sizing: content-box;
+        overflow: visible;
+    }
+    .divider-text{
+        position: absolute;
+        -webkit-transform: translateX(-50%);
+        -ms-transform: translateX(-50%);
+        transform: translateX(-50%);
+        left: 50%;
+        padding: 0 8px;
+        white-space: nowrap;
+        background-color: #fff;
+    }
+    .Text-color--gray400 {
+        color: rgba(26,26,26,.5);
+    }
+}

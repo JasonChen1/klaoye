@@ -4168,9 +4168,111 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: 'Guest Checkout',
+  name: 'GuestCheckout',
   components: {},
   props: {
     isMobile: {
@@ -4180,40 +4282,149 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      isMobile: window.isMobile,
       isLoading: false,
-      // address
-      form: {
-        email: '',
-        firstname: '',
-        lastname: '',
-        address1: '',
-        city: '',
-        state: '',
-        country: '',
-        phone: '',
-        postal_code: ''
-      },
       error: '',
       // toast
       toastMessage: '',
       toastPosition: 'is-top',
       toastType: '',
       // payment form
-      paymentForm: new _form_form__WEBPACK_IMPORTED_MODULE_0__.default({
+      form: new _form_form__WEBPACK_IMPORTED_MODULE_0__.default({
         stripeToken: '',
         prod: null,
         order_no: null,
-        shipping_address_id: null,
-        shippingAddress: null,
         color: null,
         cartData: null,
-        delivery: 0
+        // address
+        email: '',
+        phone: '',
+        name: '',
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        postal_code: ''
       }),
-      directCheckout: null
+      directCheckout: null,
+      delivery_total: 0,
+      discount_total: 0,
+      subtotal: 0,
+      total: 0,
+      // cart
+      cartData: [],
+      // stripe
+      stripe: null,
+      card: null,
+      stripeRes: {},
+      showPaymentModal: false,
+      showPaymentLoading: false
     };
   },
+  mounted: function mounted() {
+    this.cartData = this.$store.getters.carts;
+    var totals = this.$store.getters.cartTotal;
+    this.total = totals.total;
+    this.subtotal = totals.subtotal;
+    this.discount_total = totals.discount_total;
+    this.delivery_total = totals.delivery_total;
+    this.stripe = Stripe('pk_test_51J2d97FkeXjw08GhyB6jSpj8ZHkwIYxtomInAJsLNjleturgCUrPpvSyzq2wq5MADrFQAEChtDFri2Pbch4eRzpn00DduYcMvV');
+    var elements = this.stripe.elements();
+    var style = {
+      base: {
+        color: '#32325D',
+        fontWeight: 500,
+        fontFamily: 'Source Code Pro, Consolas, Menlo, monospace',
+        fontSize: '16px',
+        fontSmoothing: 'antialiased',
+        '::placeholder': {
+          color: '#CFD7DF'
+        },
+        ':-webkit-autofill': {
+          color: '#e39f48'
+        }
+      },
+      invalid: {
+        color: '#E25950',
+        '::placeholder': {
+          color: '#FFCCA5'
+        }
+      }
+    };
+    this.card = elements.create('card');
+    this.card.mount('#card-element');
+  },
   methods: {
+    checkout: function checkout() {
+      if (!this.form.email || !this.form.name || !this.form.address || !this.form.city || !this.form.postal_code) {
+        this.error = 'Please fill in your email and shipping address.';
+        return;
+      }
+
+      this.showPaymentLoading = true;
+      var self = this;
+      self.stripe.createToken(self.card).then(function (result) {
+        if (result.error) {
+          var errorElement = document.getElementById('card-errors');
+          errorElement.textContent = result.error.message;
+          self.showPaymentLoading = false;
+        } else {
+          self.form.stripeToken = result.token.id;
+          self.form.prod = self.directCheckout;
+          self.form.color = self.colorId;
+          self.form.order_no = self.order_no;
+          self.form.cartData = self.cartData;
+          self.form.delivery = self.selectedDelivery;
+          self.form.submit('post', '/api/checkout').then(function (res) {
+            self.stripeRes = res; // self.showPaymentModal = true
+
+            self.submitPayment();
+          })["catch"](function (err) {
+            self.disErr(err);
+          })["finally"](function (res) {
+            self.showPaymentLoading = false;
+          });
+        }
+      });
+    },
+    submitPayment: function submitPayment() {
+      this.isLoading = true;
+      var self = this;
+      self.stripe.confirmCardPayment(self.stripeRes.client_secret, {
+        payment_method: {
+          card: self.card,
+          billing_details: {
+            name: "New Order - ".concat(self.$store.getters.username)
+          }
+        }
+      }).then(function (result) {
+        if (result.error) {
+          this.$buefy.notification.open({
+            duration: 3000,
+            message: result.error.message,
+            position: 'is-top-right',
+            type: 'is-danger',
+            hasIcon: true
+          });
+        } else {
+          if (result.paymentIntent.status === 'succeeded') {
+            self.paymentCallback();
+          }
+        }
+      });
+    },
+    paymentCallback: function paymentCallback() {
+      var _this = this;
+
+      axios.post("/api/stripe/callback", this.stripeRes).then(function (res) {
+        _this.isLoading = false; // this.$store.dispatch('clearCart')
+
+        _this.errors = [];
+
+        _this.$router.push("/checkout/success");
+      })["catch"](function (err) {
+        console.log(err);
+      });
+    },
     setError: function setError(val) {
       this.$buefy.notification.open({
         duration: 3000,
@@ -95152,26 +95363,229 @@ var render = function() {
                 },
                 [
                   _c("div", { staticClass: "address-head " }, [
-                    _c("h2", { staticClass: "pb-3" }, [
-                      _vm._v("Shipping Address")
+                    _c("strong", [_vm._v("Total")]),
+                    _vm._v(" "),
+                    _c("h1", { staticClass: "pb-3" }, [
+                      _vm._v("$ " + _vm._s(_vm.total))
                     ])
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "address-wp" }, [
-                    _c(
-                      "form",
-                      {
-                        staticClass: "address-form",
-                        on: {
-                          click: function($event) {
-                            _vm.error = ""
-                          }
+                  _c(
+                    "div",
+                    { staticClass: "prod-tb" },
+                    _vm._l(_vm.cartData, function(item, i) {
+                      return _c("div", { key: i, staticClass: "prod" }, [
+                        _c("div", { staticClass: "p-img" }, [
+                          item.images.length > 0
+                            ? _c(
+                                "div",
+                                {
+                                  directives: [
+                                    {
+                                      name: "lazy-container",
+                                      rawName: "v-lazy-container",
+                                      value: { selector: "img" },
+                                      expression: "{ selector: 'img' }"
+                                    }
+                                  ]
+                                },
+                                [
+                                  _c("img", {
+                                    attrs: {
+                                      "data-src":
+                                        "/storage/thumbnail/" +
+                                        item.images[0].image_url
+                                    }
+                                  })
+                                ]
+                              )
+                            : _c(
+                                "div",
+                                {
+                                  directives: [
+                                    {
+                                      name: "lazy-container",
+                                      rawName: "v-lazy-container",
+                                      value: { selector: "img" },
+                                      expression: "{ selector: 'img' }"
+                                    }
+                                  ]
+                                },
+                                [
+                                  _c("img", {
+                                    attrs: {
+                                      "data-src": "/public/errorImage.jpg"
+                                    }
+                                  })
+                                ]
+                              )
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "prod-des pl-2" }, [
+                          _c("strong", { staticClass: "p-name" }, [
+                            _vm._v(
+                              "\n                                Name: " +
+                                _vm._s(item.name) +
+                                "\n                            "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          item.color_code
+                            ? _c("div", { staticClass: "cart-color-wp" }, [
+                                _c("strong", [_vm._v("Colour:")]),
+                                _vm._v(" "),
+                                _c("p", {
+                                  staticClass: "cb ml-2",
+                                  style: "background: " + item.color_code + ";"
+                                })
+                              ])
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _c("div", [
+                            _vm._v(
+                              "\n                                Qty: " +
+                                _vm._s(item.num) +
+                                "\n                            "
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "sub-wp" }, [
+                          _c("div", { staticClass: "sub-wp-inner" }, [
+                            item.discount > 0
+                              ? _c("p", [
+                                  _vm._v(
+                                    " \n                                    $" +
+                                      _vm._s(
+                                        item.subtotal - item.discount_total
+                                      )
+                                  ),
+                                  _c("br"),
+                                  _vm._v(" "),
+                                  _c("s", [_vm._v("$" + _vm._s(item.subtotal))])
+                                ])
+                              : _c("p", [_vm._v(" $" + _vm._s(item.subtotal))]),
+                            _vm._v(" "),
+                            _c("p", { staticClass: "unit-line" }, [
+                              _vm._v("$" + _vm._s(item.price) + " each")
+                            ])
+                          ])
+                        ])
+                      ])
+                    }),
+                    0
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "total-wp " }, [
+                    _c("div", { staticClass: "price-wp" }, [
+                      _c("h2", [_vm._v("Subtotal")]),
+                      _vm._v(" "),
+                      _c("h2", { staticClass: "price" }, [
+                        _vm._v(" $" + _vm._s(_vm.subtotal))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "price-wp" }, [
+                      _c("h2", [_vm._v("Delivery Cost")]),
+                      _vm._v(" "),
+                      _c("h2", { staticClass: "price" }, [
+                        _vm._v(" $" + _vm._s(_vm.delivery_total))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "price-wp" }, [
+                      _c("h2", [_vm._v("Discount")]),
+                      _vm._v(" "),
+                      _c("h2", { staticClass: "price" }, [
+                        _vm._v(" $" + _vm._s(_vm.discount_total))
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "price-wp" }, [
+                      _c("h2", [_vm._v("Total")]),
+                      _vm._v(" "),
+                      _c("h2", { staticClass: "price" }, [
+                        _vm._v(" $" + _vm._s(_vm.total))
+                      ])
+                    ])
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _vm.isMobile ? _c("hr", { staticClass: "hr" }) : _vm._e(),
+              _vm._v(" "),
+              _c("div", { staticClass: "guest-checkout-method-wp col-md-6" }, [
+                _c("div", { staticClass: "paypal-wp" }, [
+                  _vm._v(
+                    "\n                    paypal img - todo\n                "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "divider" }, [
+                  _c("hr"),
+                  _vm._v(" "),
+                  _c("p", { staticClass: "divider-text Text-color--gray400" }, [
+                    _vm._v(
+                      "\n                        Or pay with card\n                    "
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("h2", { staticClass: "pb-3" }, [
+                  _vm._v("Shipping Information")
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "stripe-form" }, [
+                  _c(
+                    "form",
+                    {
+                      staticClass: "address-form",
+                      on: {
+                        click: function($event) {
+                          _vm.error = ""
                         }
-                      },
-                      [
+                      }
+                    },
+                    [
+                      _c("label", { staticClass: "mb-2" }, [_vm._v("Email")]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "form-group" },
+                        [
+                          _c(
+                            "b-field",
+                            [
+                              _c("b-input", {
+                                attrs: {
+                                  type: "email",
+                                  placeholder: "Email*",
+                                  icon: "email",
+                                  required: ""
+                                },
+                                model: {
+                                  value: _vm.form.email,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.form, "email", $$v)
+                                  },
+                                  expression: "form.email"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "mb-2" }, [
+                        _vm._v("Shipping Address")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-row" }, [
                         _c(
                           "div",
-                          { staticClass: "form-group" },
+                          { staticClass: "col pr-0" },
                           [
                             _c(
                               "b-field",
@@ -95179,16 +95593,16 @@ var render = function() {
                                 _c("b-input", {
                                   attrs: {
                                     type: "text",
-                                    placeholder: "First Name*",
+                                    placeholder: "Name*",
                                     icon: "account",
                                     required: ""
                                   },
                                   model: {
-                                    value: _vm.form.firstname,
+                                    value: _vm.form.name,
                                     callback: function($$v) {
-                                      _vm.$set(_vm.form, "firstname", $$v)
+                                      _vm.$set(_vm.form, "name", $$v)
                                     },
-                                    expression: "form.firstname"
+                                    expression: "form.name"
                                   }
                                 })
                               ],
@@ -95200,64 +95614,7 @@ var render = function() {
                         _vm._v(" "),
                         _c(
                           "div",
-                          { staticClass: "form-group " },
-                          [
-                            _c(
-                              "b-field",
-                              [
-                                _c("b-input", {
-                                  attrs: {
-                                    type: "text",
-                                    placeholder: "Last Name",
-                                    icon: "account"
-                                  },
-                                  model: {
-                                    value: _vm.form.lastname,
-                                    callback: function($$v) {
-                                      _vm.$set(_vm.form, "lastname", $$v)
-                                    },
-                                    expression: "form.lastname"
-                                  }
-                                })
-                              ],
-                              1
-                            )
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "form-group" },
-                          [
-                            _c(
-                              "b-field",
-                              [
-                                _c("b-input", {
-                                  attrs: {
-                                    type: "email",
-                                    placeholder: "Email*",
-                                    icon: "email",
-                                    required: ""
-                                  },
-                                  model: {
-                                    value: _vm.form.email,
-                                    callback: function($$v) {
-                                      _vm.$set(_vm.form, "email", $$v)
-                                    },
-                                    expression: "form.email"
-                                  }
-                                })
-                              ],
-                              1
-                            )
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "form-group" },
+                          { staticClass: "col pl-0" },
                           [
                             _c(
                               "b-field",
@@ -95281,40 +95638,42 @@ var render = function() {
                             )
                           ],
                           1
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "form-group" },
-                          [
-                            _c(
-                              "b-field",
-                              [
-                                _c("b-input", {
-                                  attrs: {
-                                    type: "text",
-                                    placeholder: "Address*",
-                                    icon: "google-maps",
-                                    required: ""
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "form-group mb-0" },
+                        [
+                          _c(
+                            "b-field",
+                            [
+                              _c("b-input", {
+                                attrs: {
+                                  type: "text",
+                                  placeholder: "Address*",
+                                  icon: "google-maps",
+                                  required: ""
+                                },
+                                model: {
+                                  value: _vm.form.address,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.form, "address", $$v)
                                   },
-                                  model: {
-                                    value: _vm.form.address,
-                                    callback: function($$v) {
-                                      _vm.$set(_vm.form, "address", $$v)
-                                    },
-                                    expression: "form.address"
-                                  }
-                                })
-                              ],
-                              1
-                            )
-                          ],
-                          1
-                        ),
-                        _vm._v(" "),
+                                  expression: "form.address"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-row" }, [
                         _c(
                           "div",
-                          { staticClass: "form-group" },
+                          { staticClass: "col pr-0" },
                           [
                             _c(
                               "b-field",
@@ -95343,7 +95702,38 @@ var render = function() {
                         _vm._v(" "),
                         _c(
                           "div",
-                          { staticClass: "form-group" },
+                          { staticClass: "col pl-0" },
+                          [
+                            _c(
+                              "b-field",
+                              [
+                                _c("b-input", {
+                                  attrs: {
+                                    type: "text",
+                                    placeholder: "Postal Code*",
+                                    icon: "google-maps",
+                                    required: ""
+                                  },
+                                  model: {
+                                    value: _vm.form.postal_code,
+                                    callback: function($$v) {
+                                      _vm.$set(_vm.form, "postal_code", $$v)
+                                    },
+                                    expression: "form.postal_code"
+                                  }
+                                })
+                              ],
+                              1
+                            )
+                          ],
+                          1
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-row" }, [
+                        _c(
+                          "div",
+                          { staticClass: "col pr-0" },
                           [
                             _c(
                               "b-field",
@@ -95371,7 +95761,7 @@ var render = function() {
                         _vm._v(" "),
                         _c(
                           "div",
-                          { staticClass: "form-group" },
+                          { staticClass: "col pl-0" },
                           [
                             _c(
                               "b-field",
@@ -95380,7 +95770,8 @@ var render = function() {
                                   attrs: {
                                     type: "text",
                                     placeholder: "Country",
-                                    icon: "google-maps"
+                                    icon: "google-maps",
+                                    required: ""
                                   },
                                   model: {
                                     value: _vm.form.country,
@@ -95395,79 +95786,29 @@ var render = function() {
                             )
                           ],
                           1
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "div",
-                          { staticClass: "form-group" },
-                          [
-                            _c(
-                              "b-field",
-                              [
-                                _c("b-input", {
-                                  attrs: {
-                                    type: "text",
-                                    placeholder: "Postal Code*",
-                                    icon: "google-maps",
-                                    required: ""
-                                  },
-                                  model: {
-                                    value: _vm.form.postal_code,
-                                    callback: function($$v) {
-                                      _vm.$set(_vm.form, "postal_code", $$v)
-                                    },
-                                    expression: "form.postal_code"
-                                  }
-                                })
-                              ],
-                              1
-                            )
-                          ],
-                          1
                         )
-                      ]
-                    )
-                  ])
-                ]
-              ),
-              _vm._v(" "),
-              _vm.isMobile ? _c("hr", { staticClass: "hr" }) : _vm._e(),
-              _vm._v(" "),
-              _c("div", { staticClass: "guest-checkout-method-wp col-md-6" }, [
-                _c("div", { staticClass: "checkout-head " }, [
-                  _c("h2", { staticClass: "pb-3" }, [_vm._v("Payment")])
-                ]),
-                _vm._v(" "),
-                _c("div", [
-                  _c("p", [_c("strong", [_vm._v("Subtotal")]), _vm._v(" $")]),
+                      ])
+                    ]
+                  ),
                   _vm._v(" "),
-                  _c("p", [
-                    _c("strong", [_vm._v("Delivery Cost")]),
-                    _vm._v(" $")
+                  _c("h2", { staticClass: "pb-3 pt-5" }, [
+                    _vm._v("Payment Details")
                   ]),
                   _vm._v(" "),
-                  _c("p", [_c("strong", [_vm._v("Discount")]), _vm._v(" $")]),
-                  _vm._v(" "),
-                  _c("p", [_c("strong", [_vm._v("Total")]), _vm._v(" $")])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { class: "col-md-6" }, [
-                    _c("div", { staticClass: "checkout-content-wp" }, [
-                      _c("label", { attrs: { for: "card-element" } }, [
-                        _vm._v(
-                          "\n                                Credit/Debit Card\n                            "
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c("div", {
-                        staticClass: "form-control",
-                        staticStyle: { height: "2.4em", "padding-top": ".7em" },
-                        attrs: { id: "card-element" }
-                      }),
-                      _vm._v(" "),
-                      _c("div", { attrs: { id: "card-errors", role: "alert" } })
-                    ])
+                  _c("div", { staticClass: "checkout-content-wp" }, [
+                    _c("label", { attrs: { for: "card-element" } }, [
+                      _vm._v(
+                        "\n                            Card Infomation\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", {
+                      staticClass: "form-control",
+                      staticStyle: { height: "2.4em", "padding-top": ".7em" },
+                      attrs: { id: "card-element" }
+                    }),
+                    _vm._v(" "),
+                    _c("div", { attrs: { id: "card-errors", role: "alert" } })
                   ])
                 ]),
                 _vm._v(" "),
@@ -95475,29 +95816,25 @@ var render = function() {
                   _c(
                     "button",
                     {
-                      staticClass: "btn btn-black lg",
+                      staticClass: "btn btn-black lg w-100",
                       on: {
                         click: function($event) {
                           return _vm.checkout()
                         }
                       }
                     },
-                    [_vm._v("Submit")]
+                    [_vm._v("Pay $" + _vm._s(_vm.total))]
                   )
                 ]),
                 _vm._v(" "),
                 _vm.error
-                  ? _c(
-                      "span",
-                      { staticClass: "err text-left d-flex pl-3 pt-3" },
-                      [
-                        _vm._v(
-                          "\n                    " +
-                            _vm._s(_vm.error) +
-                            "\n                "
-                        )
-                      ]
-                    )
+                  ? _c("span", { staticClass: "err text-left d-flex pt-3" }, [
+                      _vm._v(
+                        "\n                    " +
+                          _vm._s(_vm.error) +
+                          "\n                "
+                      )
+                    ])
                   : _vm._e()
               ])
             ]
@@ -95517,6 +95854,136 @@ var render = function() {
           })
         ],
         1
+      ),
+      _vm._v(" "),
+      _c(
+        "b-modal",
+        {
+          attrs: {
+            active: _vm.showPaymentModal,
+            width: 350,
+            "can-cancel": ["escape", "x"]
+          },
+          on: {
+            "update:active": function($event) {
+              _vm.showPaymentModal = $event
+            }
+          }
+        },
+        [
+          _c("div", { staticClass: "modal-header" }, [
+            _c("h1", { staticClass: "modal-title" }, [_vm._v("Payment")]),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "close",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    _vm.showPaymentModal = false
+                  }
+                }
+              },
+              [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+            )
+          ]),
+          _vm._v(" "),
+          _c(
+            "b-notification",
+            { staticClass: "payment-form-wp", attrs: { closable: false } },
+            [
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "modal-body text-center" }, [
+                  _c("div", [
+                    _c("div", { staticClass: "cost-wp" }, [
+                      _c("strong", [_vm._v("Subtotal:")]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "price-tag-wp" }, [
+                        _c("strong", [_vm._v("$ " + _vm._s(_vm.subtotal))])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "cost-wp" }, [
+                      _c("strong", [_vm._v("Delivery Cost:")]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "price-tag-wp" }, [
+                        _c("strong", [
+                          _vm._v("$ " + _vm._s(_vm.delivery_total))
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "cost-wp" }, [
+                      _c("strong", [_vm._v("Discount:")]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "price-tag-wp" }, [
+                        _c("strong", [
+                          _vm._v("$ " + _vm._s(_vm.discount_total))
+                        ])
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "cost-wp" }, [
+                      _c("strong", [_vm._v("Total:")]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "price-tag-wp" }, [
+                        _c("strong", [_vm._v("$ " + _vm._s(_vm.total))])
+                      ])
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-danger",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        _vm.showPaymentModal = false
+                      }
+                    }
+                  },
+                  [_vm._v("Cacncel Payment")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        return _vm.submitPayment($event)
+                      }
+                    }
+                  },
+                  [_vm._v("Pay")]
+                )
+              ]),
+              _vm._v(" "),
+              _c("b-loading", {
+                attrs: {
+                  "is-full-page": false,
+                  active: _vm.isLoading,
+                  "can-cancel": false
+                },
+                on: {
+                  "update:active": function($event) {
+                    _vm.isLoading = $event
+                  }
+                }
+              })
+            ],
+            1
+          )
+        ],
+        1
       )
     ],
     1
@@ -95527,7 +95994,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("h1", [_c("strong", [_vm._v("Fill In Checkout Details")])])
+    return _c("h1", [_c("strong", [_vm._v("Checkout")])])
   }
 ]
 render._withStripped = true
