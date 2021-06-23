@@ -35,4 +35,8 @@ class Product extends Model
     public function subcategory(){
         return $this->belongsTo('App\Models\SubCategory');
     }
+
+    public function image(){
+        return $this->hasOne('App\Models\ProductImage');
+    }
 }

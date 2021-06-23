@@ -4,18 +4,18 @@
             <div class="img-wp">
                 <router-link class="" :to="`/${product.category_name}/${product.id}`" >
                     <figure class="m-0 figure" v-lazy-container="{ selector: 'img' }">
-                        <img alt="" :data-src="`storage/${product.images[0]?product.images[0].image_url:''}`">
+                        <img alt="" :data-src="`storage/${product.image?product.image.image_url:''}`">
                     </figure>
                 </router-link>
             </div>
             <div :class="isMobile?'product-text-mb':'product-text'">
                 <div class="product-text-content">
                     <div class="tags tg">
-                        <b-tag type="is-danger" v-if="product.discount">{{ `$ ${product.discount}` }} OFF</b-tag>
+                        <b-tag type="is-danger" v-if="product.discount>0">{{ `$ ${product.discount}` }} OFF</b-tag>
                     </div>
                     <div class="product-price">
                         <strong>$
-                            <span v-if="product.discount" class="pw-ds">{{discount}} <s>{{product.price}}</s></span>
+                            <span v-if="product.discount>0" class="pw-ds">{{discount}} <s>{{product.price}}</s></span>
                             <span v-else>{{product.price}}</span>
                         </strong>
                     </div>
@@ -81,7 +81,10 @@
         },
         computed:{
             discount(){
-                return (this.product.price-this.product.discount).toFixed(2)
+                if(this.product.discount>0){
+                    return (this.product.price-this.product.discount).toFixed(2)
+                }
+                return 0 
             }
         },
         methods:{

@@ -461,6 +461,10 @@ ul{
             display: flex;
         }
     }
+    .carousel-list{
+        max-width: 500px;
+        /*max-height: 90px;*/
+    }
 }
 @media (max-width: 1100px){
     .magnifier-wp{
@@ -915,5 +919,16 @@ ul{
     }
     .Text-color--gray400 {
         color: rgba(26,26,26,.5);
+    }
+}
+/*checkout success*/
+.checkout-success{
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    h1{
+        display: flex;
+        justify-content: center;
     }
 }

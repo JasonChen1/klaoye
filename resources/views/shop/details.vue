@@ -35,12 +35,12 @@
                 <div>
                     <h1><strong v-html="product.name"></strong></h1>
                     <div>
-                        <b-tag type="is-danger" v-if="product.discount">{{ product.discount.includes('%') ? product.discount : `$ ${product.discount}` }} OFF</b-tag>
+                        <b-tag type="is-danger" v-if="product.discount>0">{{ product.discount.includes('%') ? product.discount : `$ ${product.discount}` }} OFF</b-tag>
                     </div>
                     <div class="product-price mt-3">
                         <h1>
                             <strong>$
-                                <span v-if="discount" class="pw-ds">{{discount}} <s>{{product.price}}</s></span>
+                                <span v-if="discount>0" class="pw-ds">{{discount}} <s>{{product.price}}</s></span>
                                 <span v-else>{{product.price}}</span>
                             </strong>
                         </h1>
@@ -137,13 +137,13 @@
             },
             updateImage(val){
                 this.item.title = this.product.name
-                this.item.image = val.image
+                this.item.image = val.image.replace('thumbnail/','')
             },
             getDetails(){
                 axios.get(`/api/products/${this.id}`)
                 .then(res=>{
                     this.product = res.data
-                    if(res.data.discount){
+                    if(res.data.discount>0){
                         this.discount = (res.data.price-res.data.discount).toFixed(2)
                     }
 
@@ -152,8 +152,8 @@
                         this.items.push({
                             alt: res.data.name,
                             title: res.data.name,
-                            image:  `/storage/${res.data.images[i].image_url}`,
-                            srcFallback:  `/storage/${res.data.images[i].image_url}`
+                            image:  `/storage/thumbnail/${res.data.images[i].image_url}`,
+                            srcFallback:  `/storage/thumbnail/${res.data.images[i].image_url}`
                         })
                     }
             

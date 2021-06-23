@@ -11,8 +11,8 @@
                     <div class="prod-tb">
                         <div class="prod" v-for="(item,i) in cartData" :key="i">
                             <div class="p-img">
-                                <div v-if="item.images.length>0" v-lazy-container="{ selector: 'img' }" >
-                                    <img :data-src="`/storage/thumbnail/${item.images[0].image_url}`">
+                                <div v-if="item.image" v-lazy-container="{ selector: 'img' }" >
+                                    <img :data-src="`/storage/thumbnail/${item.image.image_url}`">
                                 </div>
                                 <div v-else v-lazy-container="{ selector: 'img' }" >
                                     <img :data-src="`/public/errorImage.jpg`">
@@ -173,7 +173,7 @@
                                         <b-input 
                                             type="text" 
                                             v-model="form.country" 
-                                            placeholder="Country" 
+                                            placeholder="Country*" 
                                             icon="google-maps"
                                             required
                                             >
@@ -202,55 +202,6 @@
             <b-loading :is-full-page="false" :active.sync="isLoading" :can-cancel="false"></b-loading>
         </b-notification>
 
-         <b-modal 
-                :active.sync="showPaymentModal" 
-                :width="350"
-                :can-cancel="['escape', 'x']">
-            <div class="modal-header">
-                <h1 class="modal-title">Payment</h1>
-                <button type="button" class="close" @click.prevent="showPaymentModal=false">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <b-notification :closable="false"  class="payment-form-wp" >
-                <div class="modal-body" >
-                    <div class="modal-body text-center" >
-                        <div >
-                            <div class="cost-wp">
-                                <strong>Subtotal:</strong>
-                                <div class="price-tag-wp">
-                                    <strong >$ {{subtotal}}</strong>
-                                </div>
-                            </div>
-                            <div class="cost-wp" >
-                                <strong>Delivery Cost:</strong>
-                                <div class="price-tag-wp">
-                                    <strong>$ {{ delivery_total }}</strong>
-                                </div>
-                            </div>
-                            <div class="cost-wp" >
-                                <strong>Discount:</strong>
-                                <div class="price-tag-wp">
-                                    <strong>$ {{ discount_total }}</strong>
-                                </div>
-                            </div>
-                            <div class="cost-wp">
-                                <strong>Total:</strong>
-                                <div class="price-tag-wp">
-                                    <strong>$ {{ total }}</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" @click="showPaymentModal=false">Cacncel Payment</button>
-                    <button type="button" class="btn btn-primary" @click.prevent="submitPayment">Pay</button>
-                </div>
-                <b-loading :is-full-page="false" :active.sync="isLoading" :can-cancel="false"></b-loading>
-            </b-notification>
-        </b-modal>
     </div>
 </template>
 
@@ -302,8 +253,6 @@
                 stripe:null,
                 card:null,
                 stripeRes:{},
-                showPaymentModal:false,
-                showPaymentLoading:false,
             }
         },
         mounted(){
@@ -343,17 +292,17 @@
         },
         methods:{
             checkout(){
-                if(!this.form.email || !this.form.name || !this.form.address || !this.form.city || !this.form.postal_code){
+                if(!this.form.email || !this.form.name || !this.form.address || !this.form.city || !this.form.postal_code || !this.form.country){
                     this.error = 'Please fill in your email and shipping address.'
                     return
                 }
-                this.showPaymentLoading = true
+                this.isLoading = true
                 let self = this
                 self.stripe.createToken(self.card).then(function(result) {
                     if (result.error) {
                         var errorElement = document.getElementById('card-errors');
                         errorElement.textContent = result.error.message;
-                        self.showPaymentLoading = false
+                        self.isLoading = false
                     } else {
                         self.form.stripeToken = result.token.id
                         self.form.prod = self.directCheckout
@@ -364,26 +313,22 @@
                         self.form.submit('post','/api/checkout')
                         .then(res=>{
                             self.stripeRes = res
-                            // self.showPaymentModal = true
                             self.submitPayment()
                         })
                         .catch(err=>{
                             self.disErr(err)
-                        })
-                        .finally(res=>{
-                            self.showPaymentLoading = false
+                            self.isLoading = false
                         })
                     }
                 });
             },
             submitPayment(){
-                this.isLoading = true
                 let self = this
                 self.stripe.confirmCardPayment(self.stripeRes.client_secret, {
                     payment_method: {
                         card: self.card,
                         billing_details: {
-                            name: `New Order - ${self.$store.getters.username}`
+                            name: `New Order`
                         }
                     }
                 }).then(function(result) {
@@ -406,7 +351,7 @@
                 axios.post(`/api/stripe/callback`,this.stripeRes)
                 .then(res=>{
                     this.isLoading = false
-                    // this.$store.dispatch('clearCart')
+                    this.$store.dispatch('clearCart')
                     this.errors=[]
                     this.$router.push(`/checkout/success`)
                 })

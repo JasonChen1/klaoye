@@ -38,6 +38,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($request->id);
         $product->update(['status'=>$request->status]);
         Cache::tags('products')->flush();
+        Cache::tags('categories')->flush();
         return response()->json($product->status,200);
     }
 
@@ -49,6 +50,10 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
+        if(!$request->status){
+            $request['status'] = 1;
+        }
+
         $prod = Product::create($request->all());
 
         if($request->images){
@@ -68,6 +73,7 @@ class ProductController extends Controller
             }
         }
         Cache::tags('products')->flush();
+        Cache::tags('categories')->flush();
         return response()->json($prod->load(['details','images']),200);
     }
 
@@ -131,6 +137,17 @@ class ProductController extends Controller
         }    
 
         $prod = Product::findOrFail($id);
+        if($request->discount=='null'){
+            $request['discount']=0.00;
+        }
+
+        if($request->status=='null'){
+            $request['status'] = 1;
+        }
+        if($request->delivery=='null'){
+            $request['delivery']=0.00;
+        }
+
         $prod->update($request->except(['sub_category_id','sub_category_name']));
 
         if($request->images){
@@ -150,6 +167,7 @@ class ProductController extends Controller
         }
 
         Cache::tags('products')->flush();
+        Cache::tags('categories')->flush();
 
         return response()->json($prod->load(['details','images']),200);
     }
@@ -165,6 +183,7 @@ class ProductController extends Controller
         $prod = Product::findOrFail($id);
         $prod->delete();
         Cache::tags('products')->flush();
+        Cache::tags('categories')->flush();
         return response()->json('done',204);
     }
 

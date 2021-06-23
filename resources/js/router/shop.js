@@ -24,7 +24,7 @@ export default new Router({
 		// { path: '/order', name:'b_order', component: require('@user/order.vue').default , meta: { requiresAuth: true }},
 		// { path: '/address', name:'b_address', component: require('@user/address.vue').default , meta: { requiresAuth: true }},
 		// { path: '/reset/password', name:'b_update_password', component: require('@user/resetPassword.vue').default , meta: { requiresAuth: true }},
-		// { path: '/checkout/success', name:'b_checkout_success', component: require('@shop/checkoutSuccess.vue').default },
+		{ path: '/checkout/success', name:'CHECKOUT SUCCESS', component: require('@shop/checkoutSuccess.vue').default },
 
 		{ path: '/:category', name:'CATEGORY', component: require('@shop/products.vue').default },
 		{ path: '/:category/:product', name:'PRODUCT DETAILS', component: require('@shop/details.vue').default },

@@ -33,8 +33,8 @@
                 :mobile-cards="hasMobileCards">
 
                 <b-table-column v-slot="props" field="image" label="Image" width="100" centered > 
-                    <div v-if="props.row.images.length>0" v-lazy-container="{ selector: 'img' }" @click="imageActive(props.row.images[0].image_url)" class="cart-product-img">
-                        <img :data-src="`/storage/thumbnail/${props.row.images[0].image_url}`">
+                    <div v-if="props.row.image" v-lazy-container="{ selector: 'img' }" @click="imageActive(props.row.image.image_url)" class="cart-product-img">
+                        <img :data-src="`/storage/thumbnail/${props.row.image.image_url}`">
                     </div>
                     <div v-else v-lazy-container="{ selector: 'img' }" class="cart-product-img">
                         <img :data-src="`/public/errorImage.jpg`">

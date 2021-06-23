@@ -22,6 +22,8 @@ Route::get('testimonials','ShopController@testimonials');
 Route::post('checkout','ShopController@checkout');
 Route::post('stripe/callback','ShopController@stripeCallback');
 
+Route::get('rename','ShopController@rename');
+
 // 用户
 Route::prefix('user')->group(function(){
 	Route::post('login', 'Auth\User\AuthController@login')->name('login');
