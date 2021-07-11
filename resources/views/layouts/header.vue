@@ -203,6 +203,12 @@
                 .then(res=>{
                     this.cart = this.$store.getters.userCarts
                 })
+                .catch(err=>{
+                    if(err.response.status==401){
+                        this.$store.dispatch('setLogout')
+                        this.$router.go('/login')
+                    }
+                })
             }else{
                 this.cart = this.$store.getters.carts.length
             }

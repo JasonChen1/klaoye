@@ -31,7 +31,7 @@
         </div>
         <div :class="isMobile?'filter-left-mb':'row'">
             <div class="col-md-3" v-if="!isMobile">
-                <div :class="isMobile?'':'left-filter fixed'">
+                <div class="left-filter fixed">
                     <b-menu accordion="accordion">
                         <b-menu-list label="Categories">
                             <b-menu-item :label="`${item.name} (${item.count})`" v-for="(item,i) in categories" :key="i" tag="router-link" :to="`/${item.name}`" :active="categoryActive==item.name"></b-menu-item>
@@ -60,11 +60,11 @@
                         <b-input v-model="searchTerm" placeholder="search" expanded />
                     </b-dropdown-item>
 
-                    <b-dropdown-item v-for="item of filteredData" :key="item.name" aria-role="listitem">
-                        <router-link class="" :to="`/${item.name}`"> 
-                        {{item.name}} ({{item.count}})
-                        </router-link>
-                    </b-dropdown-item>
+                    <router-link class="" v-for="item of filteredData" :key="item.name" :to="`/${item.name}`"> 
+                        <b-dropdown-item  aria-role="listitem">
+                            {{item.name}} ({{item.count}})
+                        </b-dropdown-item>
+                    </router-link>
                 </b-dropdown>
             </div>
             <div :class="isMobile?'':'col-md-9 pl-0'">

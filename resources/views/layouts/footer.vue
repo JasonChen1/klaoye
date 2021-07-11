@@ -58,7 +58,7 @@ f<template>
                             </li>
                         </ul>
                     </collapsible>
-                    <collapsible :isMobile="isMobile" title="Social Media" >
+                    <collapsible :isMobile="isMobile" title="SOCIAL MEDIA" >
                         <ul class=" ml-0 mt-0 footer-list">
                             <li >
                                 <a class="footer-link p-0 m-0" href="url" target="_blank">

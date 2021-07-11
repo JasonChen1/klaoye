@@ -20,9 +20,12 @@ Route::get('products/{id}','ShopController@details');
 Route::get('products','ShopController@products');
 Route::get('testimonials','ShopController@testimonials');
 Route::post('checkout','ShopController@checkout');
+Route::post('paypal/checkout','ShopController@paypalCheckout');
 Route::post('stripe/callback','ShopController@stripeCallback');
+Route::post('enquiry','ShopController@enquiry');
 
-Route::get('rename','ShopController@rename');
+
+// Route::get('rename','ShopController@rename');
 
 // 用户
 Route::prefix('user')->group(function(){
@@ -44,10 +47,20 @@ Route::prefix('user')->group(function(){
 		Route::get('cart','UserController@cart');
 		Route::delete('cart/{id}','UserController@deleteFromCart');
 		Route::patch('cart/{id}','UserController@updateQuantity');
-
-		// Route::resource('address','UserAddressController');
-		// Route::get('order/status/{status}','UserOrderController@orderStatus');
-		// Route::resource('order','UserOrderController',['as' => 'user']);
+		// user detail
+		Route::get('details','UserController@details');
+		Route::patch('details','UserController@updateDetails');
+		// user addreess
+		Route::get('address','UserController@address');
+		Route::patch('address','UserController@updateAddress');
+		// payment
+		Route::post('checkout','UserController@checkout');
+		Route::post('paypal/checkout','UserController@paypalCheckout');
+		Route::post('stripe/callback','UserController@stripeCallback');
+		// 订单
+		Route::get('order','UserController@getOrders',['as' => 'user']);
+		// order details
+		Route::get('order/details/{id}','OrderDetailController@show',['as' => 'user']);
 		Route::get('logout', 'Auth\User\AuthController@logout');
 	});
 });
@@ -78,12 +91,12 @@ Route::prefix('admin')->group(function(){
 		Route::resource('categories','CategoryController');
 		Route::get('categories/all','CategoryController@all');
 		Route::delete('subcategories/{id}','CategoryController@destroySubCategory');
-		// coupon
-		Route::resource('coupon','CouponController');
-		// 地址
-		Route::resource('address','AdminAddressController',['as'=>'admin']);
 		// 订单
-		Route::resource('order','AdminOrderController',['as' => 'admin']);
+		Route::resource('order','OrderController',['as' => 'admin']);
+		// order details
+		Route::resource('order/details','OrderDetailController',['as' => 'admin']);
+		// enquiries
+		Route::resource('enquiry','EnquiryController');
 		// 登出
 		Route::get('logout', 'Auth\Admin\AuthController@logout');
 	});

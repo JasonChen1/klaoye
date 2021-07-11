@@ -14,7 +14,7 @@
             }
         },
         mounted(){
-           
+            this.$emit('reloadHeader') 
         },
         computed:{
             

@@ -168,17 +168,27 @@
                 if(this.product.stock<this.product.occupied+1){
                     this.$buefy.notification.open({
                         duration: 3000,
-                        message: this.$t('shop.out_of_stock'),
+                        message: 'Out of stock',
                         position: 'is-top-right',
                         type: 'is-danger',
                         hasIcon: true
                     })
                     return
                 }
+
+                if(!this.colorId){
+                    if(this.product.details.length>0){
+                        this.color_code = this.product.details[0].color_code
+                        this.colorId = this.product.details[0].id
+                    }
+                }
+
+                this.color_code = this.color_code.replace('#','')
+
                 if(!this.auth){
-                    this.$router.push(`/guest/checkout?prod=${prod.product_id}&color=${this.colorId}`)
+                    this.$router.push(`/guest/checkout?prod=${prod.id}&color_id=${this.colorId}&color_code=${this.color_code}`)
                 }else{
-                    this.$router.push(`/checkout?prod=${prod.product_id}&color=${this.colorId}`)
+                    this.$router.push(`/checkout?prod=${prod.id}&color_id=${this.colorId}&color_code=${this.color_code}`)
                 }
             },
             addToCart(prod){

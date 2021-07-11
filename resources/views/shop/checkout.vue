@@ -67,8 +67,13 @@
                 <hr v-if="isMobile" class="hr">
                 <div class="guest-checkout-method-wp col-md-6">
                     <div class="paypal-wp">
-                        paypal img - todo
+                        <div id="smart-button-container">
+                            <div style="text-align: center; z-index: 1; position: relative;">
+                                <div id="paypal-button-container"></div>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="divider">
                         <hr>
                         <p class="divider-text Text-color--gray400">
@@ -112,7 +117,7 @@
                                             type="text" 
                                             v-model="form.phone" 
                                             placeholder="Phone" 
-                                            icon="google-maps"
+                                            icon="phone"
                                             >
                                         </b-input>
                                     </b-field>
@@ -241,6 +246,8 @@
                     state:'',
                     country:'',
                     postal_code:'',
+                    // paypal
+                    pStatus:'',
                 }),
                 directCheckout:null,
                 delivery_total:0,
@@ -249,20 +256,26 @@
                 total:0,
                 // cart
                 cartData:[],
+                singleProd:false,
                 // stripe
                 stripe:null,
                 card:null,
                 stripeRes:{},
             }
         },
-        mounted(){
-            this.cartData = this.$store.getters.carts
-            let totals = this.$store.getters.cartTotal
-            this.total = totals.total
-            this.subtotal = totals.subtotal
-            this.discount_total = totals.discount_total
-            this.delivery_total = totals.delivery_total
-
+        mounted(){ 
+            this.initPayPalButton()
+            if(this.$route.query.prod){
+                this.singleProd = true
+                this.getProdcut(this.$route.query)
+            }else{
+                this.cartData = this.$store.getters.carts
+                let totals = this.$store.getters.cartTotal
+                this.total = totals.total
+                this.subtotal = totals.subtotal
+                this.discount_total = totals.discount_total
+                this.delivery_total = totals.delivery_total
+            }
             this.stripe = Stripe('pk_test_51J2d97FkeXjw08GhyB6jSpj8ZHkwIYxtomInAJsLNjleturgCUrPpvSyzq2wq5MADrFQAEChtDFri2Pbch4eRzpn00DduYcMvV')
 
             var elements = this.stripe.elements();
@@ -291,6 +304,79 @@
             this.card.mount('#card-element');
         },
         methods:{
+            getProdcut(query){
+                axios.get(`/api/products/${query.prod}`)
+                .then(res=>{
+                    this.cartData = [res.data]
+                    this.cartData[0]['color_code'] = query.color_code?'#'+query.color_code:''
+                    this.cartData[0]['color_id'] = query.color_id
+                    this.cartData[0]['image'] = res.data.images[0]
+                    this.cartData[0]['num'] = 1
+                    this.total = parseFloat(res.data.price)-parseFloat(res.data.discount)+parseFloat(res.data.delivery)
+                    this.subtotal = this.cartData[0]['subtotal'] = parseFloat(res.data.price)
+                    this.discount_total = parseFloat(res.data.discount)
+                    this.delivery_total = parseFloat(res.data.delivery)
+                })
+                .catch(err=>{
+                    console.log(err)
+                })
+            },
+            initPayPalButton() {
+                let self = this
+                paypal.Buttons({
+                    style: {
+                        shape: 'pill',
+                        color: 'blue',
+                        layout: 'horizontal',
+                        label: 'checkout',
+                    },
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [
+                            {
+                                "description":"Klaoye - Checkout",
+                                "amount":{
+                                    "currency_code":"USD",
+                                    "value":self.total
+                                }
+                            }
+                            ]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            // paypal checkout 
+                            self.form.prod = self.singleProd
+                            self.form.color = self.colorId
+                            self.form.order_no = self.order_no
+                            self.form.cartData = self.cartData
+                            self.form.delivery = self.selectedDelivery
+                            // address
+                            self.form.email = details.payer.email_address
+                            self.form.name = details.purchase_units[0].shipping.name.full_name
+                            self.form.address = details.purchase_units[0].shipping.address.address_line_1
+                            self.form.state = details.purchase_units[0].shipping.address.admin_area_1
+                            self.form.city = details.purchase_units[0].shipping.address.admin_area_2
+                            self.form.country = details.purchase_units[0].shipping.address.country_code
+                            self.form.postal_code = details.purchase_units[0].shipping.address.postal_code
+                            self.form.pStatus = details.status
+                            self.form.submit('post','/api/paypal/checkout')
+                            .then(res=>{
+                                if(!self.singleProd){
+                                    self.$store.dispatch('clearCart')
+                                }
+                                self.$router.push(`/checkout/success`)
+                            })
+                            .catch(err=>{
+                                self.disErr(err)
+                            })
+                        });
+                    },
+                    onError: function(err) {
+                        self.disErr(err)
+                    }
+                }).render('#paypal-button-container');
+            },
             checkout(){
                 if(!this.form.email || !this.form.name || !this.form.address || !this.form.city || !this.form.postal_code || !this.form.country){
                     this.error = 'Please fill in your email and shipping address.'
@@ -316,6 +402,7 @@
                             self.submitPayment()
                         })
                         .catch(err=>{
+                            self.error = 'Please fill in your email and shipping address.'
                             self.disErr(err)
                             self.isLoading = false
                         })
@@ -351,24 +438,25 @@
                 axios.post(`/api/stripe/callback`,this.stripeRes)
                 .then(res=>{
                     this.isLoading = false
-                    this.$store.dispatch('clearCart')
-                    this.errors=[]
+                    if(!this.singleProd){
+                        this.$store.dispatch('clearCart')
+                    }
+                    this.error=[]
                     this.$router.push(`/checkout/success`)
                 })
                 .catch(err=>{
                     console.log(err)
                 })
             },
-            setError(val){
+            disErr(err){
                 this.$buefy.notification.open({
                     duration: 3000,
-                    message: val,
+                    message: err,
                     position: 'is-top-right',
                     type: 'is-danger',
                     hasIcon: true
                 })
-                this.error = val
-            }
+            },
         }
     }
 </script>

@@ -49214,7 +49214,7 @@ h1, h2, h3, h4, h5, h6 {
 .pagintaed-custom .paginate-text-right input {
   width: 40px;
   margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-right: 0.3rem;
 }
 .pagintaed-custom .pagination.is-centered {
   margin-bottom: 0px;
@@ -49689,7 +49689,7 @@ ul {
 }
 
 .mb-filter-wp {
-  padding: 2rem 0.5rem 0.5rem 0.75rem;
+  padding: 2.1rem 0.5rem 0.5rem 0.75rem;
 }
 .mb-filter-wp .filter-list {
   display: flex;
@@ -49775,6 +49775,10 @@ ul {
 .img-wp {
   position: relative;
   overflow: hidden;
+}
+
+.list-view .img-wp {
+  overflow: initial !important;
 }
 
 .overlay-content {
@@ -50101,4 +50105,98 @@ ul {
 .checkout-success h1 {
   display: flex;
   justify-content: center;
+}
+
+/*user dahsboard*/
+.dst {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #c0c1c1;
+}
+.dst h1 {
+  padding-bottom: 1rem;
+}
+
+.action-btn {
+  background: #73b3ad;
+  color: #fff;
+}
+.action-btn:hover {
+  background: #73b3ad;
+  color: #fff;
+}
+.action-btn:focus {
+  border-color: #73b3ad;
+  box-shadow: none;
+  background: #7dc1ba;
+  color: #fff;
+}
+
+.dst-mb {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-row-mb {
+  display: flex;
+  justify-content: space-between;
+}
+.form-row-mb .fr-label {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/*admin order page*/
+.tb-pd {
+  display: flex;
+}
+.tb-pd img {
+  width: 45px;
+  max-width: initial;
+}
+
+.customer-detail-bt-right {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 1rem;
+}
+
+.order-sidebar .sidebar-content {
+  width: 90vh !important;
+}
+
+.cursor {
+  cursor: pointer;
+  color: #1d8c9f;
+}
+.cursor img {
+  max-width: 80px;
+}
+
+@media screen and (max-width: 1226px) {
+  .order-sidebar .sidebar-content {
+    width: 80vh !important;
+  }
+}
+@media screen and (max-width: 900px) {
+  .order-sidebar .sidebar-content {
+    width: 60vh !important;
+  }
+}
+.customer-detail {
+  padding: 0.5rem;
+}
+
+/*contact page*/
+.contact-wp {
+  padding: 1rem;
+}
+.contact-wp .contact-lt {
+  font-size: 12pt;
+}
+.contact-wp .media-content {
+  overflow-x: initial;
 }

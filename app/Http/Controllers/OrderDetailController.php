@@ -2,27 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderDetail;
+use App\Models\{Order,OrderDetail,OrderShippingAddress};
 use Illuminate\Http\Request;
+use App\Traits\HelperTrait;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Testimonial as TestimonialRequest;
+use Cache;
 
 class OrderDetailController extends Controller
 {
+
+    use HelperTrait;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
     {
         //
     }
@@ -44,9 +40,20 @@ class OrderDetailController extends Controller
      * @param  \App\Models\OrderDetail  $orderDetail
      * @return \Illuminate\Http\Response
      */
-    public function show(OrderDetail $orderDetail)
+    public function show(Request $request, $id)
     {
-        //
+        $items = OrderDetail::where('order_id',$id)->with(['product'=>function($q){
+            $q->with('image');
+        }])->get();
+        
+        $shipping = OrderShippingAddress::where('order_id',$id)->first();
+        
+        $response = [
+            'items'=>$items,
+            'shipping'=>$shipping
+        ];
+
+        return response()->json($response,200);
     }
 
     /**
