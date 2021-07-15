@@ -20,7 +20,6 @@
                 Facebook: 
                 <a href="https://www.facebook.com/Klaoyelife-103192698672359">Klaoye</a>
             </p>
-
         </div>
         <div class="col-md-6">
             <b-notification :closable="false" class="form-notification">

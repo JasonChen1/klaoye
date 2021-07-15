@@ -87,6 +87,8 @@ Route::prefix('admin')->group(function(){
 		Route::post('product/set','ProductController@setActive');
 		Route::post('product/colour','ProductController@addColour');
 		Route::delete('product/colour/{id}','ProductController@deleteColour');
+		// upload product
+		Route::post('product/upload','ProductController@upload');
 		// categories
 		Route::resource('categories','CategoryController');
 		Route::get('categories/all','CategoryController@all');

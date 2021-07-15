@@ -4106,7 +4106,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Contact',
@@ -4173,6 +4172,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _components_magnifier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @components/magnifier */ "./resources/views/components/magnifier.vue");
+//
 //
 //
 //
@@ -76671,15 +76671,11 @@ var render = function() {
                 _vm._v(" "),
                 _vm.product.description
                   ? _c("div", { staticClass: "prod-description-wp" }, [
-                      _c("h2", [
-                        _c("strong", [_vm._v("Description:")]),
-                        _vm._v(" "),
-                        _c("span", {
-                          domProps: {
-                            innerHTML: _vm._s(_vm.product.description)
-                          }
-                        })
-                      ])
+                      _vm._m(1),
+                      _vm._v(" "),
+                      _c("p", {
+                        domProps: { innerHTML: _vm._s(_vm.product.description) }
+                      })
                     ])
                   : _vm._e()
               ])
@@ -76695,6 +76691,12 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("h2", [_c("strong", [_vm._v("Colours:")])])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h2", [_c("strong", [_vm._v("Description:")])])
   }
 ]
 render._withStripped = true

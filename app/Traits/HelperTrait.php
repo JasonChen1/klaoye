@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 use Illuminate\Http\Request;
-use App\Models\{Product,OrderShippingAddress,OrderDetail};
+use App\Models\{Product,OrderShippingAddress,OrderDetail,Category};
 use Illuminate\Support\Facades\Validator;
 use App\Rules\StringSymbol;
 use Carbon\Carbon;
@@ -36,6 +36,75 @@ trait HelperTrait
 
         return $response;
 	}
+
+    // 格式化批量更新
+    public function bulkUpdate($rows,$table,$fields){
+        $query = 'UPDATE '.$table.' SET ';
+        foreach ($fields as $field) {
+            $cases[$field] = ' CASE ';
+        }
+        $now = Carbon::now()->toDateTimeString();
+        $codes = [];
+        foreach ($rows as $val) {
+            $code = $val['code'];
+            array_push($codes, $code);
+            foreach ($cases as $key => $case) {
+                if($key=='updated_at'){
+                    $cases[$key] .= ' WHEN ( `code` = '.$val['code'].' )  THEN "'.$now.'" ';
+                }else {
+                    $cases[$key] .= ' WHEN ( `code` = '.$val['code'].' )  THEN "'.$val[$key].'"';
+                }
+            }
+        }
+
+        foreach ($cases as $key => $case) {
+            $cases[$key] .= ' END';
+        }
+
+        foreach ($cases as $key => $value) {
+            $query .= '`'.$key.'` = '.$value.',';
+        }
+
+        $codes = implode(',', $codes);
+        $query = substr($query,0,-1).' `code` IN ('.$codes.')';
+        return $query;
+    }
+
+    // 清除所有符号、/、<>、html字符
+    private function formatValue($val){
+        $val = trim($val);
+        $val = stripslashes($val);
+        $val = htmlspecialchars($val);
+        $val = strip_tags($val);
+        return $val;
+    }
+
+     // 格式化导入保存的数据
+    public function formatInsert($rows){
+        $now = Carbon::now()->toDateTimeString();
+        $response = [];
+
+        for ($i=0; $i < count($rows); $i++) {
+            if($cid = Category::where('name',$rows[$i][2])->first())
+            $insertD = [
+                'code'=>$rows[$i][0],
+                'name'=>$rows[$i][1],
+                'category_id'=>$cid->id,
+                'category_name'=>$rows[$i][2],
+                'base_price'=>$rows[$i][3],
+                'price'=>$rows[$i][4],
+                'size'=>$rows[$i][5].'x'.$rows[$i][6].'x'.$rows[$i][7],
+                'stock'=>$rows[$i][8],
+                'description'=>$rows[$i][9],
+                'created_at'=>$now,
+                'updated_at'=>$now
+            ];
+
+            array_push($response, $insertD);
+            
+        }
+        return $response;
+    }
 
     /*creating new order with order details and shipping address*/
     public function createNewOrder(Request $request,$type=false){

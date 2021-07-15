@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="feature-wp">
-            <!-- <b-field class="file is-info mr-1" :class="{'has-name': !!file}">
-                <b-upload v-model="file" class="file-label">
+            <b-field class="file is-info mr-1" :class="{'has-name': !!file}">
+                <b-upload v-model="file" class="file-label" :loading="fileLoading">
                     <span class="file-cta">
                         <b-icon class="file-icon" icon="upload"></b-icon>
                         <span class="file-label">Import Products</span>
                     </span>
                 </b-upload>
-            </b-field> -->
+            </b-field>
             <b-button type="is-info" @click.prevent="productAction(null,'add')">
                 <b-icon icon="plus" size="is-small"></b-icon>
                 <span >Add Product</span>
@@ -61,6 +61,7 @@
                     </div>
                 </b-table-column>
                 <b-table-column field="price" label="Price" width="150" sortable searchable v-slot="props">
+                    <p><strong>Cost:</strong> ${{ props.row.base_price }}</p>
                     <p><strong>Price:</strong> ${{ props.row.price }}</p>
                     <p><strong>Discount:</strong> ${{ props.row.discount }}</p>
                     <p><strong>Delivery Cost:</strong> ${{ props.row.delivery }}</p>
@@ -69,7 +70,9 @@
                     {{ props.row.stock }}
                 </b-table-column>
                 <b-table-column field="description" label="Description" width="120" sortable searchable v-slot="props">
-                    <span v-html="props.row.description"></span>
+                    <div class="des-wp">
+                        <span v-html="props.row.description"></span>
+                    </div>
                 </b-table-column>
                 <b-table-column field="details" label="Details" searchable v-slot="props" width="160">
                     <div class="mb-2">
@@ -185,22 +188,40 @@
                                 </span>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <b-field label="Select a Category">
+                                <b-autocomplete
+                                    v-model="categoryName"
+                                    :placeholder="form.category_name"
+                                    :keep-first="false"
+                                    :open-on-focus="true"
+                                    :data="filterCategories"
+                                    field="name"
+                                    @select="option => (selectedCategory = option)"
+                                    :clearable="false"
+                                    >
+                                </b-autocomplete>
+                            </b-field>
+                        </div>
                         <div class="form-row">
                             <div class="col">
-                                <b-field label="Select a Category">
-                                    <b-autocomplete
-                                        v-model="categoryName"
-                                        placeholder="Categories"
-                                        :keep-first="false"
-                                        :open-on-focus="true"
-                                        :data="filterCategories"
-                                        field="name"
-                                        @select="option => (selectedCategory = option)"
-                                        :clearable="false"
-                                    >
-                                    </b-autocomplete>
+                                <b-field label="Cost">
+                                    <b-input type="text" class="" v-model="form.base_price"  @keyup="errors.base_price=''" placeholder="0.00" required></b-input>
                                 </b-field>
+                                <span class="err d-flex" v-if="errors.base_price" >
+                                    {{errors.base_price[0]}}
+                                </span>
                             </div>
+                            <div class="col">
+                                <b-field label="Price">
+                                    <b-input type="text" class="" v-model="form.price"  @keyup="errors.price=''" placeholder="0.00" required></b-input>
+                                </b-field>
+                                <span class="err d-flex" v-if="errors.price" >
+                                    {{errors.price[0]}}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div class="col" >
                                 <b-field label="Delivery Cost">
                                     <b-input type="text" class="" v-model="form.delivery"  @keyup="errors.delivery=''" placeholder="0.00" ></b-input>
@@ -208,34 +229,10 @@
                                 <span class="err d-flex" v-if="errors.delivery" >
                                     {{errors.delivery[0]}}
                                 </span>
-                                <!-- <b-field label="Select a Sub-Category">
-                                    <b-autocomplete
-                                    v-if="selectedCategory"
-                                        v-model="subCategoryName"
-                                        placeholder="Sub-Categories"
-                                        :keep-first="false"
-                                        :open-on-focus="true"
-                                        :data="filterSubCategories"
-                                        field="name"
-                                        @select="option => (selectedSubCategory = option)"
-                                        :clearable="false"
-                                    >
-                                    </b-autocomplete>
-                                </b-field> -->
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="col">
-                                <b-field label="Price">
-                                    <b-input type="text" class="" v-model="form.price"  @keyup="errors.price=''" placeholder="Price" required></b-input>
-                                </b-field>
-                                <span class="err d-flex" v-if="errors.price" >
-                                    {{errors.price[0]}}
-                                </span>
                             </div>
                             <div class="col">
                                 <b-field label="Discount">
-                                    <b-input type="text" class="" v-model="form.discount"  @keyup="errors.discount=''" placeholder="Discount" ></b-input>
+                                    <b-input type="text" class="" v-model="form.discount"  @keyup="errors.discount=''" placeholder="0.00" ></b-input>
                                 </b-field>
                                 <span class="err d-flex" v-if="errors.discount" >
                                     {{errors.discount[0]}}
@@ -253,7 +250,7 @@
                             </div>
                             <div class="col">
                                 <b-field label="Stock">
-                                    <b-input type="text" class="" v-model="form.stock"  @keyup="errors.stock=''" placeholder="Stock" required></b-input>
+                                    <b-input type="text" class="" v-model="form.stock"  @keyup="errors.stock=''" placeholder="0" required></b-input>
                                 </b-field>
                                 <span class="err d-flex" v-if="errors.stock" >
                                     {{errors.stock[0]}}
@@ -362,6 +359,9 @@
         },
         data() {
             return {
+                // file
+                file:null,
+                fileLoading:false,
                 // table
                 filter:{},
                 tableData:[],
@@ -384,6 +384,7 @@
                 toastMessage:'',
                 toastPosition:'is-top',
                 toastType:'',
+                hasIcon:false,
                 // modal
                 modalType:'',
                 modalTitle:'',
@@ -406,6 +407,7 @@
                     code:'',
                     name:'',
                     price:'',
+                    base_price:'',
                     discount:0,
                     delivery:0,
                     stock:'',
@@ -435,11 +437,11 @@
             this.loadCategories()
         },
         watch:{
-            // file(){
-            //     if(this.file){
-            //         this.importProducts()
-            //     }
-            // },
+            file(){
+                if(this.file){
+                    this.uploadFile()
+                }
+            }
         },
         filters: {
             truncate(value, length) {
@@ -459,22 +461,41 @@
                         )
                 })
             },
-            // filterSubCategories(){
-            //     if(this.selectedCategory){
-            //         return this.selectedCategory.subcategories.filter(option => {
-            //             return (
-            //                 option.name
-            //                 .toString()
-            //                 .toLowerCase()
-            //                 .indexOf(this.subCategoryName.toLowerCase()) >= 0
-            //                 )
-            //         })
-            //     }else{
-            //         return ''
-            //     }
-            // }
         },
         methods:{
+            uploadFile(){
+                this.fileLoading = true
+                var formData = new FormData()
+                var file = this.file
+                formData.append("file", file);
+                axios.post('/api/admin/product/upload',formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(res=>{
+                    this.loadData()
+                    this.toastMessage = 'Upload file successfully'
+                    this.toastType = 'is-success'
+                    this.hasIcon = false
+                })
+                .catch(err=>{
+                    this.toastMessage = 'Upload file failed'
+                    this.toastType = 'is-danger'
+                    this.hasIcon = true
+                })
+                .finally(res=>{
+                    this.fileLoading = false
+                    this.$buefy.notification.open({
+                        duration: 3000,
+                        message: 'Upload file failed',
+                        position: 'is-top-right',
+                        type: 'is-danger',
+                        hasIcon: this.hasIcon
+                    })
+                    this.file = null
+                })
+            },
             loadCategories(){
                 axios.get('/api/admin/categories/all')
                 .then(res=>{

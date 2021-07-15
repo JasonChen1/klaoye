@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Product as ProductRequest;
 use App\Traits\HelperTrait;
-// use Carbon\Carbon;
-// use Excel;
+use App\Imports\ProductImport;
+use Excel;
 use Cache;
 use Image;
 
@@ -54,7 +54,7 @@ class ProductController extends Controller
             $request['status'] = 1;
         }
 
-        $prod = Product::create($request->all());
+        $prod = Product::create($request->except(['sub_category_id','sub_category_name']));
 
         if($request->images){
             foreach ($request->images as $image) {
@@ -75,6 +75,31 @@ class ProductController extends Controller
         Cache::tags('products')->flush();
         Cache::tags('categories')->flush();
         return response()->json($prod->load(['details','images']),200);
+    }
+
+    /*upload products*/
+    public function upload(Request $request){
+        $v = Validator::make([
+            'file'  => $request->file,
+            'extension' => strtolower($request->file->getClientOriginalExtension()),
+        ],
+        [
+            'file'  => 'required',
+            'extension' => 'required|in:csv,xlsx,xls,odt,ods,odp',
+        ]);
+        if ($v->fails()) {
+            abort($v->errors(),400);
+        }
+
+        $rows = Excel::toArray(new ProductImport, $request->file('file')); 
+        array_shift($rows[0]);
+        $fileData = $rows[0];
+
+        $insertData = $this->formatInsert($fileData);
+
+        Product::insert($insertData);
+        Cache::tags('products')->flush();
+        return response()->json('success',204);
     }
 
     /**

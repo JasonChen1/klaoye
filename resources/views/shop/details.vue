@@ -71,7 +71,8 @@
                         <button class="btn buy-btn " @click="buyNow(product)"><b-icon icon="cart-arrow-right"></b-icon>Buy It Now</button>
                     </div>
                     <div v-if="product.description" class="prod-description-wp">
-                        <h2><strong>Description:</strong> <span v-html=" product.description"></span></h2>
+                        <h2><strong>Description:</strong> </h2>
+                        <p v-html=" product.description"></p>
                     </div>
                 </div>
             </div>
