@@ -4921,11 +4921,11 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   mounted: function mounted() {
-    this.getCategory();
-
     if (this.$route.params) {
       this.categoryActive = this.$route.params.category;
     }
+
+    this.getCategory();
   },
   computed: {
     filteredData: function filteredData() {
@@ -74189,7 +74189,11 @@ var render = function() {
                         "a",
                         {
                           staticClass: "footer-link p-0 m-0",
-                          attrs: { href: "url", target: "_blank" }
+                          attrs: {
+                            href:
+                              "https://www.facebook.com/Klaoyelife-103192698672359",
+                            target: "_blank"
+                          }
                         },
                         [
                           _c(
@@ -74209,7 +74213,10 @@ var render = function() {
                         "a",
                         {
                           staticClass: "footer-link p-0 m-0",
-                          attrs: { href: "url", target: "_blank" }
+                          attrs: {
+                            href: "https://www.instagram.com/klaoyeworld/",
+                            target: "_blank"
+                          }
                         },
                         [
                           _c(

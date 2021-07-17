@@ -61,13 +61,13 @@ f<template>
                     <collapsible :isMobile="isMobile" title="SOCIAL MEDIA" >
                         <ul class=" ml-0 mt-0 footer-list">
                             <li >
-                                <a class="footer-link p-0 m-0" href="url" target="_blank">
+                                <a class="footer-link p-0 m-0" href="https://www.facebook.com/Klaoyelife-103192698672359" target="_blank">
                                     <span class="icon"><b-icon icon="facebook" ></b-icon></span>  
                                     <span>Facebook</span>
                                 </a>
                             </li>
                             <li >
-                                <a class="footer-link p-0 m-0" href="url" target="_blank">
+                                <a class="footer-link p-0 m-0" href="https://www.instagram.com/klaoyeworld/" target="_blank">
                                     <span class="icon"><b-icon icon="instagram" ></b-icon></span>  
                                     <span>Instagram</span>
                                 </a>

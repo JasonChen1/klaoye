@@ -162,10 +162,11 @@
             }
         },
         mounted(){
-            this.getCategory()
             if(this.$route.params){
                 this.categoryActive = this.$route.params.category
             }
+            
+            this.getCategory()
         },
         computed:{
             filteredData() {

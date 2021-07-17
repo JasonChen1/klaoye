@@ -271,7 +271,7 @@ class ShopController extends Controller
 
         $v = Validator::make($request->all(), [
             "email" => "required|email",
-            "phone" => "nullable|integer",
+            "phone" => "nullable|string",
             "name" => ['required','string'],
             "product" => ['required','string'],
             "message" => ['required','string'],

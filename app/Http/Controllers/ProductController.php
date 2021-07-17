@@ -178,12 +178,12 @@ class ProductController extends Controller
         if($request->images){
             foreach ($request->images as $image) {
                 $name = $image->getClientOriginalName();
-                $path = $image->storeAs('images',$name,'public');
+                $path = $image->storeAs('images', $name, 'public');
                 $img = new ProductImage([
                     'image_url'=>$path
                 ]);
 
-                $image->storeAs('thumbnail/images', $name,'public');
+                $image->storeAs('thumbnail/images', $name, 'public');
                 $thumbnail = public_path('storage/thumbnail/images/'.$name);
                 $this->createThumbnail($thumbnail, 90, 90);
 

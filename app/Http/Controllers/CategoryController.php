@@ -24,7 +24,7 @@ class CategoryController extends Controller
         if($filter['filter']){
             return Category::with(['subcategories'])->where($filter['query'])->orderBy($filter['orderField'],$filter['order'])->paginate(10);
         }
-
+ 
         return Cache::tags(['categories'])->rememberForever('categories.all.page_'.$request->page.'_admin', function (){
             return Category::with(['subcategories'])->orderBy('id','desc')->paginate(10);
         });
