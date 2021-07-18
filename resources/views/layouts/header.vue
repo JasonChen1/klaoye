@@ -23,7 +23,7 @@
                         >
                         <div class="p-3">
                             <router-link class="" to="/" v-lazy-container="{ selector: 'img' }">
-                                <img data-src="/images/LOGO.png" alt="KLAOYE">
+                                <img :data-src="logoSrc" alt="KLAOYE">
                             </router-link>
                             <b-menu class="pt-2">
                                 <b-menu-list label="MENU">
