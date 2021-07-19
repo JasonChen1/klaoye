@@ -182,9 +182,7 @@ class ShopController extends Controller
 		->queue((new Receipt($data['prodCallback'],$data['totals'],$data['order']['no'],$shippingAddress))
 			->onQueue('mail-queue'));
 
-		$orderEmailStr = env('ORDER_EMAIL');
-		$orderEmail = json_decode($orderEmailStr);
-
+		$orderEmail = env('ORDER_EMAIL');
         // send new order
 		Notification::route('mail', $orderEmail)->notify((new NewOrder($data['order']['no']))->onQueue('mail-queue'));
 
@@ -257,9 +255,8 @@ class ShopController extends Controller
             ->queue((new Receipt($request['products'],$request['totals'],$request->order_no,$request->address))
             ->onQueue('mail-queue'));
 
-        $orderEmailStr = env('ORDER_EMAIL');
-		$orderEmail = json_decode($orderEmailStr);
-
+        $orderEmail = env('ORDER_EMAIL');
+		
         // send new order
 		Notification::route('mail', $orderEmail)->notify((new NewOrder($request->order_no))->onQueue('mail-queue'));
 
@@ -282,9 +279,7 @@ class ShopController extends Controller
         } 
 
         $enquiry = Enquiry::create($request->all());
-
-        $orderEmailStr = env('ORDER_EMAIL');
-		$orderEmail = json_decode($orderEmailStr);
+        $orderEmail = env('ORDER_EMAIL');
         Notification::route('mail', $orderEmail)->notify((new NotifucationEnquiry($enquiry))->onQueue('mail-queue'));
 
         return response()->json('sent',204);
