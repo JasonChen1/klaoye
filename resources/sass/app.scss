@@ -169,6 +169,9 @@ td{
         }
     }
 }
+.p-icon{
+    color: #049090;
+}
 .hc-lwp,.hc-rwp{
     display: flex;
     flex-wrap: wrap;
@@ -195,9 +198,10 @@ td{
             box-shadow: 1px 2px 5px #dcdcdc;
         }
         .rating{
-            padding: 1rem 0;
+            padding: 0;
         }
         .description{
+            font-size: 13pt;
             word-break: break-word;
         }
         .person-wp{
@@ -205,6 +209,7 @@ td{
                 border-radius: 50%;
             }
             .p-circle{
+                padding: .3rem;
                 border-radius: 50%;
                 border: 1px solid #515A61;
             }

@@ -49281,6 +49281,10 @@ td {
   color: #73b3ad;
 }
 
+.p-icon {
+  color: #049090;
+}
+
 .hc-lwp, .hc-rwp {
   display: flex;
   flex-wrap: wrap;
@@ -49311,15 +49315,17 @@ td {
   box-shadow: 1px 2px 5px #dcdcdc;
 }
 .testi-wp .t-wp .rating {
-  padding: 1rem 0;
+  padding: 0;
 }
 .testi-wp .t-wp .description {
+  font-size: 13pt;
   word-break: break-word;
 }
 .testi-wp .t-wp .person-wp img {
   border-radius: 50%;
 }
 .testi-wp .t-wp .person-wp .p-circle {
+  padding: 0.3rem;
   border-radius: 50%;
   border: 1px solid #515A61;
 }

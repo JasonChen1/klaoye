@@ -47,7 +47,7 @@
                 <div class="t-wp" :class="isMobile?'mr-2':'mw-33'" v-for="(testi,i) in testimonials" :key="i">
                     <router-link :to="`/${testi.product.category_name}/${testi.product.id}`">
                         <div class="row" v-lazy-container="{ selector: 'img' }">
-                            <img class="col-4 pr-0" :data-src="testi.image.image_url" :alt="testi.product.name">
+                            <img class="col-4 pr-0" :data-src="`/storage/thumbnail/${testi.image.image_url}`" :alt="testi.product.name">
                             <div class="col-8 pd-wp">
                                 <p>{{ testi.product.name }}</p>
                                 <p>${{ testi.product.price }}</p>
@@ -72,9 +72,9 @@
                         <div class="d-flex">
                             <div class="p-circle ">
                                 <b-icon
+                                    class="p-icon"
                                     icon="account"
-                                    size="is-large"
-                                    type="is-success">
+                                    size="is-medium">
                                 </b-icon>
                             </div>
                             <div class="pl-2">

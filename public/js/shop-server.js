@@ -74369,10 +74369,7 @@ var render = function() {
                           },
                           [
                             _c("img", {
-                              attrs: {
-                                "data-src": "/images/LOGO.png",
-                                alt: "KLAOYE"
-                              }
+                              attrs: { "data-src": _vm.logoSrc, alt: "KLAOYE" }
                             })
                           ]
                         ),
@@ -76957,7 +76954,8 @@ var render = function() {
                       _c("img", {
                         staticClass: "col-4 pr-0",
                         attrs: {
-                          "data-src": testi.image.image_url,
+                          "data-src":
+                            "/storage/thumbnail/" + testi.image.image_url,
                           alt: testi.product.name
                         }
                       }),
@@ -77008,11 +77006,8 @@ var render = function() {
                     { staticClass: "p-circle " },
                     [
                       _c("b-icon", {
-                        attrs: {
-                          icon: "account",
-                          size: "is-large",
-                          type: "is-success"
-                        }
+                        staticClass: "p-icon",
+                        attrs: { icon: "account", size: "is-medium" }
                       })
                     ],
                     1
