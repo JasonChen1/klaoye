@@ -1,6 +1,6 @@
 {
-    "/js/shop-client.js": "/js/shop-client.js",
-    "/js/shop-server.js": "/js/shop-server.js",
-    "/js/admin.js": "/js/admin.js",
-    "/css/app.css": "/css/app.css"
+    "/js/shop-client.js": "/js/shop-client.js?id=27df6035cb78f842b1fd",
+    "/js/shop-server.js": "/js/shop-server.js?id=d55b51e2ded2b940020e",
+    "/js/admin.js": "/js/admin.js?id=4b967282997e73c1a238",
+    "/css/app.css": "/css/app.css?id=30fcf2ec0521f2b04557"
 }
