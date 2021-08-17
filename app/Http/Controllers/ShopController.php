@@ -137,11 +137,11 @@ class ShopController extends Controller
 						$order='desc';
 						break;
 				}
-				$response['products'] = Product::with(['details','image'])->whereNotNull('category_id')->where($where)->orderBy($orderField,$order)->paginate(10);
+				$response['products'] = Product::with(['details','image'])->whereNotNull('category_id')->where($where)->orderBy($orderField,$order)->paginate(12);
 			}
 		}else{
 			$response['products'] = Cache::tags(['products'])->rememberForever('products_front'.$request->page.'_category_'.$request->category, function () use($where){
-				return Product::with(['details','image'])->whereNotNull('category_id')->where($where)->orderBy('id','desc')->paginate(10);
+				return Product::with(['details','image'])->whereNotNull('category_id')->where($where)->orderBy('id','desc')->paginate(12);
 			});
 		}
 
