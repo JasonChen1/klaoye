@@ -25,11 +25,11 @@ class ProductController extends Controller
         $filter = $this->filter($request);
        
         if($filter['filter']){
-            return Product::with(['details','images'])->where($filter['query'])->orderBy($filter['orderField'],$filter['order'])->paginate(10);
+            return Product::with(['details','images'])->where($filter['query'])->orderBy($filter['orderField'],$filter['order'])->paginate(12);
         }
 
         return Cache::tags(['products'])->rememberForever('products.all.page_'.$request->page.'_admin', function (){
-            return Product::with(['details','images'])->orderBy('id','desc')->paginate(10);
+            return Product::with(['details','images'])->orderBy('id','desc')->paginate(12);
         });
     }
 
