@@ -83,25 +83,26 @@ trait HelperTrait
     public function formatInsert($rows){
         $now = Carbon::now()->toDateTimeString();
         $response = [];
-
         for ($i=0; $i < count($rows); $i++) {
-            if($cid = Category::where('name',$rows[$i][2])->first())
-            $insertD = [
-                'code'=>$rows[$i][0],
-                'name'=>$rows[$i][1],
-                'category_id'=>$cid->id,
-                'category_name'=>$rows[$i][2],
-                'base_price'=>$rows[$i][3],
-                'price'=>$rows[$i][4],
-                'size'=>$rows[$i][5].'x'.$rows[$i][6].'x'.$rows[$i][7],
-                'stock'=>$rows[$i][8],
-                'description'=>$rows[$i][9],
-                'created_at'=>$now,
-                'updated_at'=>$now
-            ];
+            $prod = Product::where('code',$rows[$i][0])->exists();
+            if(!$prod){
+                $cid = Category::where('name',$rows[$i][2])->first();
 
-            array_push($response, $insertD);
-            
+                $insertD = [
+                    'code'=>$rows[$i][0],
+                    'name'=>$rows[$i][1],
+                    'category_id'=>$cid->id,
+                    'category_name'=>$rows[$i][2],
+                    'base_price'=>$rows[$i][3],
+                    'price'=>$rows[$i][4],
+                    'size'=>$rows[$i][5].'x'.$rows[$i][6].'x'.$rows[$i][7],
+                    'stock'=>$rows[$i][8],
+                    'description'=>$rows[$i][9],
+                    'created_at'=>$now,
+                    'updated_at'=>$now
+                ];
+                array_push($response, $insertD);
+            }
         }
         return $response;
     }

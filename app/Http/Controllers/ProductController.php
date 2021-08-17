@@ -96,7 +96,6 @@ class ProductController extends Controller
         $fileData = $rows[0];
 
         $insertData = $this->formatInsert($fileData);
-
         Product::insert($insertData);
         Cache::tags('products')->flush();
         return response()->json('success',204);
