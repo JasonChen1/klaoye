@@ -41,6 +41,12 @@
             // this.getFontendData()
             this.loadingBar = window.loading
             this.getCategories()
+
+            let self = this
+			// if back button is pressed
+			window.onpopstate = function(event) {
+				self.$router.go(self.$route.path)
+			};
         },
         methods:{
         	reloadHeader(){
