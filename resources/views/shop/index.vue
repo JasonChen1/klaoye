@@ -1,30 +1,32 @@
 <template>
     <div class="container">
-        <div class="carousel-wp" >
-        	<b-carousel 
-        		:indicator-inside="indicatorInside"
-                :animated="animated"
-                :has-drag="drag"
-                :autoplay="autoPlay"
-                :pause-hover="pauseHover"
-                :pause-info="pauseInfo"
-                :pause-info-type="pauseType"
-                :interval="interval"
-                :repeat="repeat"
-                :arrow="false"
-                :indicator="indicator"
-                :indicator-background="indicatorBackground"
-                :indicator-mode="indicatorMode"
-                :indicator-position="indicatorPosition"
-                :indicator-style="indicatorStyle"
-        	>
-        		<b-carousel-item v-for="(src, i) in carousels" :key="i">
-        			<b-image :src="src"></b-image>
-        		</b-carousel-item>
-        		<template #indicators="props">
-        			<b-image class="al image" :src="props.src" :title="props.i"></b-image>
-        		</template>
-        	</b-carousel>
+        <div class="carousel-wp">
+            <router-link  class="router-link" to="/products" >
+            	<b-carousel 
+            		:indicator-inside="indicatorInside"
+                    :animated="animated"
+                    :has-drag="drag"
+                    :autoplay="autoPlay"
+                    :pause-hover="pauseHover"
+                    :pause-info="pauseInfo"
+                    :pause-info-type="pauseType"
+                    :interval="interval"
+                    :repeat="repeat"
+                    :arrow="false"
+                    :indicator="indicator"
+                    :indicator-background="indicatorBackground"
+                    :indicator-mode="indicatorMode"
+                    :indicator-position="indicatorPosition"
+                    :indicator-style="indicatorStyle"
+            	>
+            		<b-carousel-item v-for="(src, i) in carousels" :key="i">
+            			<b-image :src="src"></b-image>
+            		</b-carousel-item>
+            		<template #indicators="props">
+            			<b-image class="al image" :src="props.src" :title="props.i"></b-image>
+            		</template>
+            	</b-carousel>
+            </router-link>
         </div>
         <div class="cate-wp">
             <h1 class="section-title">Categories</h1>
@@ -89,14 +91,6 @@
     </div>
 </template>
 <script>
-    import carousel1 from '@images/carousel1.jpg';
-    import carousel2 from '@images/carousel2.jpg';
-    import carousel3 from '@images/carousel3.jpg';
-    import carousel4 from '@images/carousel4.jpg';
-    import home1 from '@images/home1.jpg';
-    import home2 from '@images/home2.jpg';
-    import home3 from '@images/home3.jpg';
-    import home4 from '@images/home4.jpg';
 	export default {
 		name: 'Home',
 		components: {
@@ -124,32 +118,32 @@
                 pauseType: 'is-primary',
                 interval: 4000,
                 carousels:[
-                    carousel1,
-                    carousel2,
-                    carousel3,
-                    carousel4,
+                    'https://klaoye.s3.us-west-2.amazonaws.com/carousel1.jpg',
+                    'https://klaoye.s3.us-west-2.amazonaws.com/carousel2.jpg',
+                    'https://klaoye.s3.us-west-2.amazonaws.com/carousel3.jpg',
+                    'https://klaoye.s3.us-west-2.amazonaws.com/carousel4.jpg',
                 ],
                 leftCate:[
                     {
                         name:'Living-room',
-                        src:home1,
+                        src:'https://klaoye.s3.us-west-2.amazonaws.com/home1.jpg',
                         url:'/Living-room'
                     },
                     {
                         name:'Bedroom',
-                        src:home2,
+                        src:'https://klaoye.s3.us-west-2.amazonaws.com/home2.jpg',
                         url:'/Bedroom'
                     },
                 ],
                 rightCate:[
                     {
                         name:'Bathroom',
-                        src:home3,
+                        src:'https://klaoye.s3.us-west-2.amazonaws.com/home3.jpg',
                         url:'/Bathroom'
                     },
                     {
                         name:'For Pets',
-                        src:home4,
+                        src:'https://klaoye.s3.us-west-2.amazonaws.com/home4.jpg',
                         url:'/For Pets'
                     },
                 ],

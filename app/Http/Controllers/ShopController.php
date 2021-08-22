@@ -24,8 +24,9 @@ class ShopController extends Controller
 	use HelperTrait;
 
 	public function index(Request $request) {
-		$ssr = $this->render($request->path());
-		return view('shop',['ssr' => $ssr]);
+		// $ssr = $this->render($request->path());
+		// return view('shop',['ssr' => $ssr]);
+		return view('shop');
 	}
 
 	private function render($path) {

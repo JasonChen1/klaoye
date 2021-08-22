@@ -5,11 +5,33 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <!-- meta tags -->
-<meta name=”description” content="/">
-<meta name="keywords" content="/">
+<meta name=”description” content="To develop people's life quality, Klaoye online store offer kinds of appliances for using in our home, including products in Living-room, bedroom, kitchen, bathroom and for pets.">
+<meta name="keywords" content="KLAOYE, household, kitchen appliance, pets">
 <title>KLAOYE - Household, Kitchen Appliance, Pets</title>
 
 <link rel="canonical" href="https://klaoye.com">
+
+<meta name="author" content="KLAOYE">
+<meta name="copyright" content="KLAOYE">
+<meta name="application-name" content="KLAOYE">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://klaoye.com">
+<meta property="og:title" content="KLAOYE - Household, Kitchen Appliance, Pets">
+<meta property="og:description" content="To develop people's life quality, Klaoye online store offer kinds of appliances for using in our home, including products in Living-room, bedroom, kitchen, bathroom and for pets.">
+<meta property="og:image" content="https://klaoye.s3.us-west-2.amazonaws.com/home4.jpg">
+<meta property="og:site_name" content="KLAOYE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="https://klaoye.com">
+<meta name="twitter:image" content="https://klaoye.s3.us-west-2.amazonaws.com/home4.jpg">
+<meta name="twitter:title" content="KLAOYE - Household, Kitchen Appliance, Pets">
+<meta name="twitter:description" content="To develop people's life quality, Klaoye online store offer kinds of appliances for using in our home, including products in Living-room, bedroom, kitchen, bathroom and for pets.">
+<meta itemprop="name" content="KLAOYE - Household, Kitchen Appliance, Pets">
+<meta itemprop="description" content="To develop people's life quality, Klaoye online store offer kinds of appliances for using in our home, including products in Living-room, bedroom, kitchen, bathroom and for pets.">
+<meta itemprop="image" content="https://klaoye.s3.us-west-2.amazonaws.com/home4.jpg">
+
+
+
 <!-- Fonts -->
 <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico"/>
 <link href="{{ mix('css/app.css') }}" rel="stylesheet" async>

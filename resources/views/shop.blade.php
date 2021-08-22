@@ -3,7 +3,7 @@
 
 @section('content')
 <div id="app">
-{!! $ssr !!}
+	<!-- ssr code here -->
 </div>
 @endsection
 
